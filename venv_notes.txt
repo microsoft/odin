@@ -1,0 +1,6 @@
+pip install langchain
+pip install langchain-openai
+pip install langchain-community
+pip install langgraph
+pip install python-dotenv
+pip install Flask
