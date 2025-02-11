@@ -1,0 +1,127 @@
+/* general chat background */
+.chat_background{
+	height: 100%;
+	margin: 0;
+    background: white;
+}
+
+/* auto margin for where chat window is centered using bootstrap grid system*/
+.chat_margin{
+	margin-top: auto; /* auto = The browser calculates a top margin */
+	margin-bottom: auto; /* auto = The browser calculates a bottom margin */
+}
+
+/* overall chat window formatting */
+.card{
+	height: 95vh; /* makes the chat window smaller or larger by height; original value was absolute 500px, vh sets height as relative */
+	border-radius: 15px !important; /* rounding to chat window edges*/
+	background-color: rgba(0,0,0,0.4) !important; /* chat window backgroud color */
+}
+
+/* chat message window formatting */
+.msg_card_body{
+	overflow-y: auto; /* Should cause a scrolling mechanism to be provided for overflowing boxes */
+}
+
+/* chat input formatting */
+.card-footer{
+border-radius: 0 0 15px 15px !important;
+	border-top: 0 !important;
+}
+
+/* chat input formatting */
+.type_msg{
+	background-color: rgba(0,0,0,0.3) !important;
+	border:0 !important;
+	color:white !important;
+	height: 60px !important;
+	overflow-y: auto;
+}
+	.type_msg:focus{
+	 box-shadow:none !important;
+   outline:0px !important;
+}
+
+/* send button formatting */
+.send_btn{
+	border-radius: 0 15px 15px 0 !important;
+	background-color: rgba(0,0,0,0.3) !important;
+	border:0 !important;
+	color: white !important;
+	cursor: pointer;
+	height: 60px !important;
+}
+
+/* chat header icon formatting */
+.user_img{
+	height: 70px;
+	width: 70px;
+	border:1.5px solid #f5f6fa;
+
+}
+
+/* user and AI icon formatting */
+.user_img_msg{
+	height: 40px;
+	width: 40px;
+
+}
+
+/* container around user icon and AI icon, formatting */
+.img_cont_msg{
+	height: 40px;
+	width: 40px;
+}
+
+/* chat header icon formatting */
+.img_cont{
+	position: relative;
+	height: 70px;
+	width: 70px;
+}
+
+/* AI response message formatting */
+.msg_cotainer{
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: 10px;
+	border-radius: 25px;
+	background-color: rgb(129 195 255);
+	padding: 10px;
+	position: relative;
+}
+
+/* user chat message formatting */
+.msg_cotainer_send{
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-right: 10px;
+	border-radius: 25px;
+	background-color: #ffffff;
+	padding: 10px;
+	position: relative;
+}
+
+/* message time formatting */
+.msg_time{
+	position: absolute;
+	left: 0;
+	bottom: -15px;
+	color: rgba(255,255,255,0.5);
+	font-size: 10px;
+}
+
+/* message time formatting */
+.msg_time_send{
+	position: absolute;
+	right:0;
+	bottom: -15px;
+	color: rgba(255,255,255,0.5);
+	font-size: 10px;
+}
+
+/* chat window header formatting */
+.msg_head{
+	position: relative;
+}
+
