@@ -10,4 +10,4 @@ This is a collaboration repo between AF Group + Microsoft for developing a POC c
 3.	Azure functions as alternative host target
 
 # Current Agent Graph
-![Project Graph](graph_image.png)
+![Project Graph](src/graph_image.png)
