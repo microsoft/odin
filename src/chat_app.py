@@ -7,7 +7,9 @@ def get_chat_response(input):
 
 @app.route('/')
 def homepage():
-    return render_template("homepage.html")
+    # Replace this with actual data retrieval logic
+    claims_data = ["Claim 1", "Claim 2", "Claim 3"]
+    return render_template("homepage.html", claims=claims_data)
 
 @app.route("/chat_get", methods=["GET", "POST"])
 def chat_get():
