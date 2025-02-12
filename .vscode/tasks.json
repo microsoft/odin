@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Python Dependencies",
+            "type": "shell",
+            "command": "pip install -r ./src/requirements.txt",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Installs the Python dependencies listed in the requirements.txt file."
+        }
+    ]
+}
