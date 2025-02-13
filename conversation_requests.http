@@ -1,0 +1,26 @@
+@claimId = 7
+@conversationId = 1
+
+GET {{host}}/claims/{{claimId}}/conversations
+
+###
+GET {{host}}/claims/{{claimId}}/conversations/{{conversationId}}
+
+###
+POST {{host}}/claims/{{claimId}}/conversations
+Content-Type: application/json
+
+{
+    "conversation_id": "{{conversationId}}",
+    "claim_id": "{{claimId}}",
+    "messages": [
+        {
+            "content": "Hello, please give me a summary of this claim",
+            "date": "{{$datetime iso8601}}",
+            "role": "user"
+        }
+    ]
+}
+
+###
+DELETE {{host}}/claims/{{claimId}}/conversations/{{conversationId}}

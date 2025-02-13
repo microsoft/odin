@@ -12,7 +12,7 @@
             <label for="claimsDropdown" class="form-label">Select Claim:</label>
             <select id="claimsDropdown" class="form-control">
                 {% for claim in claims %}
-                    <option value="{{ claim }}">{{ claim }}</option>
+                    <option value="{{ claim.claim_id }}">{{ claim.description }} - {{ claim.amount }} - {{ claim.status }}</option>
                 {% endfor %}
             </select>
         </div>
