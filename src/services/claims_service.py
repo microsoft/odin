@@ -33,4 +33,4 @@ class ClaimsService:
 
 claims_service = ClaimsService()
 
-__all__ = ["claims_service"]
+__all__ = [claims_service]
