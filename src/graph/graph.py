@@ -7,19 +7,19 @@ from nodes.route import route
 from nodes.conversate import conversate
 from graph.state import GraphState
 
-load_dotenv()
-
-ROUTE = 'route'
-CONVERSATE = 'conversate'
+ROUTE = "route"
+CONVERSATE = "conversate"
 RETRIEVE = "retrieve"
 GENERATE = "generate"
 
+
 def route_question(state):
-    task = state['task']
-    if task == 'conversate':
+    task = state["task"]
+    if task == "conversate":
         return CONVERSATE
-    if task == 'medical_records':
+    if task == "medical_records":
         return RETRIEVE
+
 
 workflow = StateGraph(GraphState)
 
@@ -34,10 +34,7 @@ workflow.set_entry_point(ROUTE)
 workflow.add_conditional_edges(
     ROUTE,
     route_question,
-    {
-        CONVERSATE: CONVERSATE,
-        RETRIEVE: RETRIEVE
-    },
+    {CONVERSATE: CONVERSATE, RETRIEVE: RETRIEVE},
 )
 workflow.add_edge(CONVERSATE, END)
 workflow.add_edge(RETRIEVE, GENERATE)
