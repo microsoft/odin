@@ -1,0 +1,21 @@
+@claimId = 8
+@conversationId = 1
+
+GET {{host}}/claims
+
+###
+GET {{host}}/claims/{{claimId}}
+
+###
+POST {{host}}/claims
+Content-Type: application/json
+
+{
+    "claim_id": 8,
+    "description": "Claim 8",
+    "amount": 800.0,
+    "status": "Accepted"
+}
+
+###
+DELETE {{host}}/claims/{{claimId}}
