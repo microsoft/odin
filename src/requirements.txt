@@ -4,3 +4,4 @@ langchain-openai
 langchain-community
 langgraph
 python-dotenv
+azure-identity
