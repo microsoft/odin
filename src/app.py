@@ -3,13 +3,24 @@ from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
+from setup_logging import set_up_logging, set_up_tracing, set_up_metrics
+
+# Update the config in the setup_logging.py file to use the new config
+#set_up_logging()
+#set_up_tracing()
+#set_up_metrics()
 
 app = Flask(__name__)
 
+<<<<<<< HEAD
 
 @app.route("/health")
 def health():
     return "OK"
+=======
+def get_chat_response(input):
+    return "Hi!"
+>>>>>>> df4afd3 (Add telemetry setup with Azure Monitor and update environment configuration)
 
 
 @app.route("/")

@@ -5,3 +5,5 @@ langchain-community
 langgraph
 python-dotenv
 azure-identity
+azure-monitor-opentelemetry
+opentelemetry-exporter-otlp
