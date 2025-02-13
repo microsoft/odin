@@ -4,7 +4,7 @@
       "type": "debugpy",
       "request": "launch",
       "name": "Launch Flask App",
-      "program": "${workspaceFolder}/src/chat_app.py"
+      "program": "${workspaceFolder}/src/app.py"
     }
   ]
 }

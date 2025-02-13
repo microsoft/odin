@@ -107,7 +107,7 @@ def converse(claim_id: int, conversation_id: int):
     # we probably only want to be passing the last message back and forth
     # and just let fetching of full conversation history be the GET endpoints concern
 
-return jsonify(conv_result["generation"])
+    return jsonify(conv_result["generation"])
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
 def delete_conversation(claim_id: int, conversation_id: int):
