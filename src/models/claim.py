@@ -4,3 +4,11 @@ class Claim:
         self.description = description
         self.amount = amount
         self.status = status
+
+    def to_dict(self):
+        return {
+            "claim_id": self.claim_id,
+            "description": self.description,
+            "amount": self.amount,
+            "status": self.status,
+        }
