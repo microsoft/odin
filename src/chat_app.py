@@ -1,4 +1,5 @@
 from flask import Flask, json, make_response, render_template, request
+from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
@@ -93,6 +94,10 @@ def converse(claim_id: int, conversation_id: int):
     request_json = request.get_json()
     conversation = Conversation(**request_json)
 
+    chat_history = conversation.messages
+
+    conv_result = run_agent(conversation.messages[-1]["content"], chat_history)
+
     # if conversation does not exist, initialize one
 
     # if one does exist, retrieve the history, append the message to it
@@ -102,14 +107,7 @@ def converse(claim_id: int, conversation_id: int):
     # we probably only want to be passing the last message back and forth
     # and just let fetching of full conversation history be the GET endpoints concern
 
-    if conversation_id is None:
-        conversation_id = ""
-    return (
-        "# todo: perform chat here. claim_id = "
-        + str(claim_id)
-        + ", conversation_id = "
-        + str(conversation_id)
-    )
+    return json.dumps(conv_result["generation"])
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
