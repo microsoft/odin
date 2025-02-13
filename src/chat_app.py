@@ -1,4 +1,4 @@
-from flask import Flask, json, make_response, render_template, request
+from flask import Flask, json, make_response, render_template, request, jsonify
 from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
@@ -104,12 +104,9 @@ def converse(claim_id: int, conversation_id: int):
 
     if conversation_id is None:
         conversation_id = ""
-    return (
-        "# todo: perform chat here. claim_id = "
-        + str(claim_id)
-        + ", conversation_id = "
-        + str(conversation_id)
-    )
+    return jsonify({
+        'message': "# todo: perform chat here. claim_id = " + str(claim_id) + ", conversation_id = " + str(conversation_id)
+    })
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
