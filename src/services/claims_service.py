@@ -12,23 +12,22 @@ class ClaimsService:
             Claim(claim_id=6, description="Claim 6", amount=600.0, status="Denied"),
         ]
 
-    def get_all(self):
+    def get_all(self) -> list[Claim]:
         return self.claims
 
-    def get_by_id(self, claim_id):
+    def get_by_id(self, claim_id: int) -> Claim:
         for claim in self.claims:
             if claim.claim_id == claim_id:
                 return claim
-        return None
 
-    def upsert(self, claim):
+    def upsert(self, claim: Claim) -> None:
         for i, existing_claim in enumerate(self.claims):
             if existing_claim.claim_id == claim.claim_id:
                 self.claims[i] = claim
                 return
         self.claims.append(claim)
 
-    def delete(self, claim_id):
+    def delete(self, claim_id: int) -> None:
         self.claims = [claim for claim in self.claims if claim.claim_id != claim_id]
 
 
