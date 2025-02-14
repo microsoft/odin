@@ -12,16 +12,12 @@ from setup_logging import set_up_logging, set_up_tracing, set_up_metrics
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
-
 @app.route("/health")
 def health():
     return "OK"
-=======
+
 def get_chat_response(input):
     return "Hi!"
->>>>>>> df4afd3 (Add telemetry setup with Azure Monitor and update environment configuration)
-
 
 @app.route("/")
 def homepage():
