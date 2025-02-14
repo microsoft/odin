@@ -6,3 +6,10 @@ langgraph
 python-dotenv
 azure-monitor-opentelemetry
 azure-identity
+opentelemetry-sdk 
+opentelemetry-exporter-otlp 
+opentelemetry-instrumentation-flask 
+opentelemetry-exporter-azure-monitor
+opentelemetry-api
+opentelemetry-exporter-applicationinsights
+opentelemetry-instrumentation-logging
