@@ -1,3 +1,5 @@
+# Logic from ChatGPT
+
 from flask import Flask, request
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
