@@ -7,9 +7,13 @@
 # --------------------------------------------------------------------------
 from azure.monitor.opentelemetry import configure_azure_monitor
 
+from config import AppConfig
+
+config = AppConfig()
+
 # Configure Azure monitor collection telemetry pipeline
 configure_azure_monitor(
-    connection_string="InstrumentationKey=70d0aeee-36d2-42b0-862c-3dd21c80ed95;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus2.livediagnostics.monitor.azure.com/;ApplicationId=f98225de-9240-471b-92fa-fd4551630693",
+    connection_string=config.app_insights_connstr,
     logger_name="mjy_test"
 )
 
