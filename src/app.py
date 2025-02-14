@@ -7,8 +7,9 @@ from services.claims_service import claims_service
 app = Flask(__name__)
 
 
-def get_chat_response(input):
-    return "Hi!"
+@app.route("/health")
+def health():
+    return "OK"
 
 
 @app.route("/")
@@ -16,12 +17,6 @@ def homepage():
     # Replace this with actual data retrieval logic
     claims = claims_service.get_all()
     return render_template("homepage.html", claims=claims)
-
-
-@app.route("/chat_get", methods=["GET", "POST"])
-def chat_get():
-    msg = request.form["msg"]
-    return get_chat_response(msg)
 
 
 @app.route("/claims", methods=["GET"])
@@ -91,6 +86,8 @@ def get_conversation(claim_id: int, conversation_id: int):
 )
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["POST"])
 def converse(claim_id: int, conversation_id: int):
+    
+
     request_json = request.get_json()
     conversation = Conversation(**request_json)
 
@@ -108,6 +105,7 @@ def converse(claim_id: int, conversation_id: int):
     # and just let fetching of full conversation history be the GET endpoints concern
 
     return jsonify(conv_result["generation"])
+
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
 def delete_conversation(claim_id: int, conversation_id: int):

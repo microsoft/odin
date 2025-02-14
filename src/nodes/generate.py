@@ -1,7 +1,6 @@
 from typing import Any, Dict
 from chains.generator import generation_chain
 from graph.state import GraphState
-from langchain_core.documents import Document
 
 
 def generate(state: GraphState) -> Dict[str, Any]:
