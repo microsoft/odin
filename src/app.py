@@ -85,13 +85,7 @@ def get_conversation(claim_id: int, conversation_id: int):
     methods=["POST"],
 )
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["POST"])
-<<<<<<< HEAD
 def converse(claim_id: str, conversation_id: int):
-=======
-def converse(claim_id: int, conversation_id: int):
-    
-
->>>>>>> b983013549b19747cfa14874df06e647f071bd64
     request_json = request.get_json()
     conversation = Conversation(**request_json)
 

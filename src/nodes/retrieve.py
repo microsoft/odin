@@ -1,13 +1,8 @@
 from typing import Any, Dict
 from graph.state import GraphState
 from langchain_community.retrievers import AzureAISearchRetriever
-<<<<<<< HEAD
-=======
-from claimnumber.claimnumber import claimnumber
 from config import config
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-
->>>>>>> b983013549b19747cfa14874df06e647f071bd64
 
 def retrieve(state: GraphState) -> Dict[str, Any]:
     print("---RETRIEVE---")
