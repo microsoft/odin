@@ -16,9 +16,6 @@ app = Flask(__name__)
 def health():
     return "OK"
 
-def get_chat_response(input):
-    return "Hi!"
-
 @app.route("/")
 def homepage():
     # Replace this with actual data retrieval logic
