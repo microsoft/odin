@@ -4,12 +4,8 @@ from models.claim import Claim
 class ClaimsService:
     def __init__(self):
         self.claims = [
-            Claim(claim_id=1, description="Claim 1", amount=100.0, status="Pending"),
-            Claim(claim_id=2, description="Claim 2", amount=200.0, status="Approved"),
-            Claim(claim_id=3, description="Claim 3", amount=300.0, status="Denied"),
-            Claim(claim_id=4, description="Claim 4", amount=400.0, status="Pending"),
-            Claim(claim_id=5, description="Claim 5", amount=500.0, status="Approved"),
-            Claim(claim_id=6, description="Claim 6", amount=600.0, status="Denied"),
+            Claim(claim_id='1234', description="Claim 1", amount=100.0, status="Pending"),
+            Claim(claim_id='4321', description="Claim 2", amount=200.0, status="Approved"),
         ]
 
     def get_all(self) -> list[Claim]:

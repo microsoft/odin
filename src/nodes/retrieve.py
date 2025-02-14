@@ -4,10 +4,11 @@ from langchain_openai import AzureOpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from graph.state import GraphState
 from langchain_community.retrievers import AzureAISearchRetriever
-from claimnumber.claimnumber import claimnumber
 
 def retrieve(state: GraphState) -> Dict[str, Any]:
     print("---RETRIEVE---")
+    # get claimnumber
+    claimnumber = state['claimnumber']
     # Setup retriever
     retriever = AzureAISearchRetriever(content_key="chunk", top_k=10, index_name="sample-claims-docs", filter=f'ClaimNumberFilter eq {claimnumber}')
     # retrieve document chunks
