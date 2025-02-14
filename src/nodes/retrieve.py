@@ -1,7 +1,4 @@
 from typing import Any, Dict
-import os
-from langchain_openai import AzureOpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
 from graph.state import GraphState
 from langchain_community.retrievers import AzureAISearchRetriever
 from claimnumber.claimnumber import claimnumber

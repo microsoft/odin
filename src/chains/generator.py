@@ -1,9 +1,6 @@
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import MessagesPlaceholder
-from pydantic import BaseModel, Field
-from typing import List, Tuple, Union, Dict
-from langchain_core.documents import Document
 from llms.llms import llm_4o
 
 
