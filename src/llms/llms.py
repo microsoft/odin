@@ -20,7 +20,7 @@ if config.azure_openai_api_key is None or config.azure_openai_api_key == "":
 else:
     llm_4o = AzureChatOpenAI(
         azure_deployment=config.azure_openai_deployment,
-        azure_ad_key=config.azure_openai_api_key,
+        # azure_ad_key=config.azure_openai_api_key,
         api_version=config.azure_openai_version,
     )
 
