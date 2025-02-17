@@ -3,6 +3,10 @@ from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient ############## USING AZURE BLOB FOR CHAT HISTORY
+import json
+import os
+from config import config
 
 app = Flask(__name__)
 
@@ -103,6 +107,38 @@ def converse(claim_id: int, conversation_id: int):
 
     # we probably only want to be passing the last message back and forth
     # and just let fetching of full conversation history be the GET endpoints concern
+
+    ############## USING AZURE BLOB FOR CHAT HISTORY
+
+    # Azure Storage Account details
+    AZURE_STORAGE_CONNECTION_STRING = config.azure_strg_conn_str
+    CONTAINER_NAME = "chat-histories"
+    BLOB_NAME = f"{conversation_id}.json"
+
+    blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+    container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+    blob_client = container_client.get_blob_client(BLOB_NAME)
+
+    new_item = conv_result  # The item to append
+
+    if blob_client.exists():
+        print("File exists. Reading content...")
+        blob_data = blob_client.download_blob().readall().decode('utf-8')
+        data_list = json.loads(blob_data)
+    
+        if isinstance(data_list, list):
+            data_list.append(new_item)
+        else:
+            print("Error: The existing file content is not a list.")
+            return
+    else:
+        print("File does not exist. Creating a new one...")
+        data_list = [new_item]
+
+    # Convert back to JSON and overwrite the blob
+    new_blob_data = json.dumps(data_list, indent=4)
+    blob_client.upload_blob(new_blob_data, overwrite=True)
+    print("File updated successfully.")
 
     return jsonify(conv_result["generation"])
 

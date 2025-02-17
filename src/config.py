@@ -21,6 +21,8 @@ class Config:
         self.langchain_tracing_v2 = os.getenv("LANGCHAIN_TRACING_V2")
         self.is_deployed = os.getenv("IS_DEPLOYED")
 
+        self.azure_strg_conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+
 config = Config()
 
 __all__ = [config]
