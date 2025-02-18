@@ -9,6 +9,8 @@ This is a collaboration repo between AF Group + Microsoft for developing a POC c
 2.	Ingestion pipeline
 3.	Azure functions as alternative host target
 
+minor readme change to test branch protection
+
 # Current Agent Graph
 ![Project Graph](src/graph_image.png)
 
