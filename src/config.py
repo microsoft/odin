@@ -6,6 +6,9 @@ class Config:
         
         load_dotenv()
 
+        self.app_insights_instrumentation_key = os.getenv("AZURE_APP_INSIGHTS_INSTRUMENTATION_KEY")
+        self.app_insights_connstr = os.getenv("AZURE_APP_INSIGHTS_CONN_STR")
+
         self.tenant_id = os.getenv("TENANT_ID")
 
         self.app_insights_connstr = os.getenv("APPINSIGHTS_CONNECTION_STRING")

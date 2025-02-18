@@ -6,7 +6,14 @@ langchain-community
 langchain-openai
 langgraph
 python-dotenv
-azure-ai-inference[opentelemetry]
 azure-monitor-opentelemetry
-opentelemetry-exporter-otlp
+azure-identity
+opentelemetry-sdk 
+opentelemetry-exporter-otlp 
+opentelemetry-instrumentation-flask 
+opentelemetry-exporter-azure-monitor
+opentelemetry-api
+opentelemetry-exporter-applicationinsights
+opentelemetry-instrumentation-logging
+azure-ai-inference[opentelemetry]
 azure-storage-blob
