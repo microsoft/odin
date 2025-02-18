@@ -1,5 +1,7 @@
-@claimId = 7
-@conversationId = 1
+@claimId = 6e3d0ae1-44be-4d2d-aeb9-c15d2bd73953
+@conversationId = 311f0f6b-67a4-4212-9919-15a82f23083c
+@userId = 99a71918-60a3-4a52-9e1a-d089bda2fc38
+@userGroupId = cb31e5f1-e226-41eb-aadf-9c957ff85287
 
 GET {{host}}/claims/{{claimId}}/conversations
 
@@ -11,8 +13,10 @@ POST {{host}}/claims/{{claimId}}/conversations
 Content-Type: application/json
 
 {
-    "conversation_id": "{{conversationId}}",
+    "id": "{{conversationId}}",
     "claim_id": "{{claimId}}",
+    "user_id": "{{userId}}",
+    "user_group_id": "{{userGroupId}}",
     "messages": [
         {
             "content": "Hello, please give me a summary of this claim",

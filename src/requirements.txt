@@ -1,7 +1,9 @@
+azure.cosmos
+azure-identity
 Flask
 langchain
-langchain-openai
 langchain-community
+langchain-openai
 langgraph
 python-dotenv
 azure-monitor-opentelemetry
@@ -13,3 +15,5 @@ opentelemetry-exporter-azure-monitor
 opentelemetry-api
 opentelemetry-exporter-applicationinsights
 opentelemetry-instrumentation-logging
+azure-ai-inference[opentelemetry]
+azure-storage-blob
