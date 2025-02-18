@@ -3,8 +3,12 @@ from flask import Flask, json, make_response, render_template, request, jsonify
 from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
-from services.conversation_service import conversation_service
+# from services.conversation_service import conversation_service
 from services.claims_service import claims_service
+from nonessential.rand_chat import get_random_response
+from nonessential.local_file_for_chat_history import local_file_for_chat_history
+from nonessential.azure_blob_for_chat_history import azure_blob_for_chat_history
+from config import config
 
 app = Flask(__name__)
 
@@ -80,15 +84,65 @@ def converse(claim_id: str, conversation_id: str):
         or conversation.claim_id != claim_id
     ):
         return json.dumps({"error": "Mismatched conversation ID or claim ID"}), 400
+    
 
-    conv_result = run_agent(conversation.messages[-1]["content"], claimnumber=claim_id, chat_history=conversation.messages)
+    def get_ai_response(conversation, chat_history):
+        # if we have an agent, set to True, otherwise set to False for development purposes
+        agent_available = True
+        if agent_available:
+            conv_result = run_agent(conversation.messages[-1]["content"], chat_history)
+        else:
+            conv_result = get_random_response(conversation.messages[-1]["content"], chat_history)
+        return conv_result
 
-    # faking chat for now
-    conversation.messages.append(conv_result)
 
-    conversation_service.upsert_conversation(conversation)
+    if config.use_cosmos_for_chat_history:
 
-    return jsonify(conversation.to_dict())
+        # if conversation does not exist, initialize one
+        #
+        # if one does exist, retrieve the history, append the message to it
+        chat_history = conversation.messages # TODO
+        # maybe need to change up the model a bit
+        #
+        # we probably only want to be passing the last message back and forth
+        # and just let fetching of full conversation history be the GET endpoints concern
+        #
+
+
+        conv_result = run_agent(conversation.messages[-1]["content"], claimnumber=claim_id, chat_history=conversation.messages)
+
+        # faking chat for now
+        conversation.messages.append(conv_result)
+
+        conversation_service.upsert_conversation(conversation)
+
+        return jsonify(conversation.to_dict())
+
+
+    elif config.use_azure_blob_for_chat_history: ### USING AZURE BLOB FOR CHAT HISTORY
+        # get chat history
+        chat_history = azure_blob_for_chat_history(request_json, conversation_id, recall_history_only=True)
+        # get AI response
+        get_ai_response(conversation, chat_history)
+        # update chat history
+        _ = azure_blob_for_chat_history(request_json, conversation_id, recall_history_only=False, conv_result=conv_result)
+        # return result
+        return jsonify(conv_result["generation"])
+    
+    elif config.use_local_file_for_chat_history:
+        # get chat history
+        chat_history = local_file_for_chat_history(request_json, conversation_id, recall_history_only=True)
+        # get AI response
+        get_ai_response(conversation, chat_history)
+        # update chat history
+        _ = local_file_for_chat_history(request_json, conversation_id, recall_history_only=False, conv_result=conv_result)
+        # return result
+        return jsonify(conv_result["generation"])
+    
+    else:
+        return jsonify("I'm sorry, I'm curring experiencing technical issues. Please try again later.")
+
+    
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
