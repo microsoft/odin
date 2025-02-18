@@ -1,7 +1,9 @@
+from datetime import datetime
 from flask import Flask, json, make_response, render_template, request, jsonify
 from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
+from services.conversation_service import conversation_service
 from services.claims_service import claims_service
 
 app = Flask(__name__)
@@ -27,12 +29,7 @@ def get_claims():
 
 
 @app.route("/claims/<claim_id>", methods=["GET"])
-def get_claim(claim_id):
-    if isinstance(claim_id, str):
-        try:
-            claim_id = int(claim_id)
-        except ValueError:
-            return json.dumps({"error": "Invalid claim ID"}), 400
+def get_claim(claim_id: str):
     claim = claims_service.get_by_id(claim_id)
     if not claim:
         return json.dumps({"error": "Claim not found"}), 404
@@ -51,32 +48,23 @@ def upsert_claim():
 
 
 @app.route("/claims/<claim_id>", methods=["DELETE"])
-def delete_claim(claim_id: int):
-    if isinstance(claim_id, str):
-        try:
-            claim_id = int(claim_id)
-        except ValueError:
-            return json.dumps({"error": "Invalid claim ID"}), 400
+def delete_claim(claim_id: str):
     claims_service.delete(claim_id)
     return make_response("Accepted", 202)
 
 
 @app.route("/claims/<claim_id>/conversations", methods=["GET"])
-def get_conversations(claim_id: int):
-    return (
-        "todo: return conversations with claim_id from cosmos db. claim_id = "
-        + claim_id
-    )
+def get_conversations(claim_id: str):
+    conversations = conversation_service.get_conversations(claim_id)
+
+    return json.dumps([conversation.to_dict() for conversation in conversations])
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["GET"])
-def get_conversation(claim_id: int, conversation_id: int):
-    return (
-        "todo: retrieve conversation with claim_id and conversation_id from cosmos db. claim_id = "
-        + claim_id
-        + ", conversation_id = "
-        + conversation_id
-    )
+def get_conversation(claim_id: str, conversation_id: str):
+    conversation = conversation_service.get_conversation(claim_id, conversation_id)
+
+    return json.dumps(conversation.to_dict())
 
 
 @app.route(
@@ -85,15 +73,34 @@ def get_conversation(claim_id: int, conversation_id: int):
     methods=["POST"],
 )
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["POST"])
-def converse(claim_id: str, conversation_id: int):
+def converse(claim_id: str, conversation_id: str):
     request_json = request.get_json()
     conversation = Conversation(**request_json)
 
-    chat_history = conversation.messages
-    claimnumber = claim_id
+    if (
+        (conversation.id != conversation_id and conversation_id is not None)
+        or conversation.claim_id != claim_id
+    ):
+        return json.dumps({"error": "Mismatched conversation ID or claim ID"}), 400
 
+    conversation_service.upsert_conversation(conversation)
 
-    conv_result = run_agent(conversation.messages[-1]["content"], claimnumber, chat_history)
+    # faking chat for now
+    conversation.messages.append(
+        {
+            "content": "I'm just a magic string, how am I supposed to help?",
+            "role": "assistant",
+            "date": datetime.now().isoformat()
+        }
+    )
+
+    conversation_service.upsert_conversation(conversation)
+
+    return jsonify(conversation.to_dict())
+
+    # chat_history = conversation.messages
+
+    # conv_result = run_agent(conversation.messages[-1]["content"], chat_history)
 
     # if conversation does not exist, initialize one
 
@@ -104,17 +111,14 @@ def converse(claim_id: str, conversation_id: int):
     # we probably only want to be passing the last message back and forth
     # and just let fetching of full conversation history be the GET endpoints concern
 
-    return jsonify(conv_result["generation"])
+    # return jsonify(conv_result["generation"])
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
-def delete_conversation(claim_id: int, conversation_id: int):
-    return (
-        "# todo: delete conversation with claim_id and conversation_id from cosmos db. claim_id = "
-        + claim_id
-        + ", conversation_id = "
-        + conversation_id
-    )
+def delete_conversation(claim_id: str, conversation_id: str):
+    conversation_service.delete_conversation(claim_id, conversation_id)
+
+    return make_response("Accepted", 202)
 
 
 if __name__ == "__main__":
