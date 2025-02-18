@@ -1,5 +1,4 @@
-@claimId = 8
-@conversationId = 1
+@claimId = 5929e58d-338d-4bc4-b37e-364fb3fe83c4
 
 GET {{host}}/claims
 
@@ -11,7 +10,7 @@ POST {{host}}/claims
 Content-Type: application/json
 
 {
-    "claim_id": 8,
+    "claim_id": "{{claimId}}",
     "description": "Claim 8",
     "amount": 800.0,
     "status": "Accepted"

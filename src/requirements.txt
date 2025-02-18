@@ -1,7 +1,9 @@
+azure.cosmos
+azure-identity
+azure.cosmos
 Flask
 langchain
-langchain-openai
 langchain-community
+langchain-openai
 langgraph
 python-dotenv
-azure-identity

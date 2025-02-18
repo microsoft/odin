@@ -21,6 +21,12 @@ class Config:
         self.langchain_tracing_v2 = os.getenv("LANGCHAIN_TRACING_V2")
         self.is_deployed = os.getenv("IS_DEPLOYED")
 
+        self.cosmos_account_uri = os.getenv("COSMOS_ACCOUNT_URI")
+        self.cosmos_account_key = os.getenv("COSMOS_ACCOUNT_KEY")
+        self.cosmos_db_name = os.getenv("COSMOS_DB_NAME")
+        self.cosmos_container_name = os.getenv("COSMOS_CONTAINER_NAME")
+        self.cosmos_partition_key = os.getenv("COSMOS_PARTITION_KEY")
+
 config = Config()
 
 __all__ = [config]
