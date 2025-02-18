@@ -31,6 +31,8 @@ var tags = {
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 
+var cosmosAccountName = '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
+
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${abbrs.resourcesResourceGroups}${environmentName}'
   location: location
@@ -177,7 +179,7 @@ module aiservices 'br/public:avm/res/cognitive-services/account:0.9.2' = {
   params: {
     name: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
     location: location
-    kind: 'AzureOpenAI'
+    kind: 'OpenAI'
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       defaultAction: 'Allow'
@@ -218,6 +220,15 @@ module aiservices 'br/public:avm/res/cognitive-services/account:0.9.2' = {
         principalId: searchService.outputs.?systemAssignedMIPrincipalId!
         // principalId: userAssignedIdentity.outputs.principalId
         roleDefinitionIdOrName: '64702f94-c441-49e6-a78b-ef80e0188fee' // Azure AI Developer
+      }
+      {
+        principalId: principalId
+        roleDefinitionIdOrName: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
+      }
+      {
+        principalId: searchService.outputs.?systemAssignedMIPrincipalId!
+        // principalId: userAssignedIdentity.outputs.principalId
+        roleDefinitionIdOrName: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
       }
     ]
     tags: tags
@@ -311,23 +322,23 @@ module databaseAccount 'br/public:avm/res/document-db/database-account:0.11.0' =
   scope: resourceGroup(rg.name)
   name: 'databaseAccountDeployment'
   params: {
-    name: '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
+    name: cosmosAccountName
     location: location
     networkRestrictions: {
       ipRules: []
       networkAclBypass: 'AzureServices'
       publicNetworkAccess: 'Enabled'
     }
-    // sqlRoleAssignmentsPrincipalIds: [
-    //   principalId
-    //   site.outputs.?systemAssignedMIPrincipalId!
-    // ]
-    // sqlRoleDefinitions: [
-    //   {
-    //     name: '00000000-0000-0000-0000-000000000002'
-    //     roleType: 'BuiltInRole'
-    //   }
-    // ]
+    sqlRoleAssignmentsPrincipalIds: [
+      principalId
+      site.outputs.?systemAssignedMIPrincipalId!
+    ]
+    sqlRoleDefinitions: [
+      {
+        name: '00000000-0000-0000-0000-000000000002'
+        roleType: 'BuiltInRole'
+      }
+    ]
     locations: [
       {
         locationName: location
@@ -391,14 +402,14 @@ InvalidTemplate: Deployment template language expression evaluation failed: 'The
 //   }
 // ]
 
-module dbRoleAssingments './db-assignments.bicep' = {
-  scope: resourceGroup(rg.name)
-  name: 'sqlRoleAssignmentDeployment'
-  params: {
-    databaseAccountName: databaseAccount.outputs.name
-    principalIds: [principalId]
-  }
-}
+// module dbRoleAssignments './db-assignments.bicep' = {
+//   scope: resourceGroup(rg.name)
+//   name: 'sqlRoleAssignmentDeployment'
+//   params: {
+//     databaseAccountName: databaseAccount.outputs.name
+//     principalIds: [principalId]
+//   }
+// }
 
 // app service plan: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/web/serverfarm
 module serverfarm 'br/public:avm/res/web/serverfarm:0.4.1' = {
