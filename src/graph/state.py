@@ -11,6 +11,7 @@ class GraphState(TypedDict):
         task: action chosen to answer question
         documents: list of documents
         chat_history: list of human inputs and AI outputs
+        claimnumber: claimnumber context for the user query
     """
 
     question: str
@@ -18,3 +19,4 @@ class GraphState(TypedDict):
     task: str
     documents: List[str]
     chat_history: List[Dict[str, Any]]
+    claimnumber: str

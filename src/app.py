@@ -85,15 +85,15 @@ def get_conversation(claim_id: int, conversation_id: int):
     methods=["POST"],
 )
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["POST"])
-def converse(claim_id: int, conversation_id: int):
-    
-
+def converse(claim_id: str, conversation_id: int):
     request_json = request.get_json()
     conversation = Conversation(**request_json)
 
     chat_history = conversation.messages
+    claimnumber = claim_id
 
-    conv_result = run_agent(conversation.messages[-1]["content"], chat_history)
+
+    conv_result = run_agent(conversation.messages[-1]["content"], claimnumber, chat_history)
 
     # if conversation does not exist, initialize one
 

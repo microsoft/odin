@@ -1,13 +1,13 @@
 from typing import Any, Dict
 from graph.state import GraphState
 from langchain_community.retrievers import AzureAISearchRetriever
-from claimnumber.claimnumber import claimnumber
 from config import config
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
-
 def retrieve(state: GraphState) -> Dict[str, Any]:
     print("---RETRIEVE---")
+    # get claimnumber
+    claimnumber = state['claimnumber']
     # Setup retriever
 
     if (
