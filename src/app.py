@@ -2,12 +2,11 @@ from flask import Flask, json, make_response, render_template, request, jsonify
 from cai_chat.cai_chat import run_agent
 from nonessential.rand_chat import get_random_response
 from nonessential.local_file_for_chat_history import local_file_for_chat_history
+from nonessential.azure_blob_for_chat_history import azure_blob_for_chat_history
 from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient ############## USING AZURE BLOB FOR CHAT HISTORY
 import json
-from config import config
 
 app = Flask(__name__)
 
@@ -104,7 +103,7 @@ def converse(claim_id: int, conversation_id: int):
     if use_cosmos_for_chat_history:
         chat_history = conversation.messages # TODO
     elif use_azure_blob_for_chat_history: ### USING AZURE BLOB FOR CHAT HISTORY
-        chat_history = conversation.messages # TODO
+        chat_history = azure_blob_for_chat_history(request_json, conversation_id, recall_history_only=True)
     elif use_local_file_for_chat_history:
         chat_history = local_file_for_chat_history(request_json, conversation_id, recall_history_only=True)
 
@@ -132,38 +131,8 @@ def converse(claim_id: int, conversation_id: int):
         pass
 
     elif use_azure_blob_for_chat_history: ### USING AZURE BLOB FOR CHAT HISTORY
-
-        # Azure Storage Account details
-        AZURE_STORAGE_CONNECTION_STRING = config.azure_strg_conn_str
-        CONTAINER_NAME = "chat-histories"
-        BLOB_NAME = f"{conversation_id}.json"
-        # define client
-        blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
-        container_client = blob_service_client.get_container_client(CONTAINER_NAME)
-        blob_client = container_client.get_blob_client(BLOB_NAME)
-        # define new item
-        new_item = conv_result  # The item to append
-        # if blob exists read history from file and append new data, 
-        #   otherwise our new data is the beginning of our chat history
-        if blob_client.exists():
-            print("File exists. Reading content...")
-            blob_data = blob_client.download_blob().readall().decode('utf-8')
-            data_list = json.loads(blob_data)
-            # check if data is a list, which it should be
-            if isinstance(data_list, list):
-                data_list.append(new_item)
-            else:
-                print("Error: The existing file content is not a list.")
-                return
-        else:
-            print("File does not exist. Creating a new one...")
-            data_list = [new_item]
-        # write out chat history
-        # Convert back to JSON and overwrite the blob
-        new_blob_data = json.dumps(data_list, indent=4)
-        blob_client.upload_blob(new_blob_data, overwrite=True)
-        print("File updated successfully.")
-
+        _ = azure_blob_for_chat_history(request_json, conversation_id, recall_history_only=False, conv_result=conv_result)
+        
     elif use_local_file_for_chat_history:
         _ = local_file_for_chat_history(request_json, conversation_id, recall_history_only=False, conv_result=conv_result)
 
