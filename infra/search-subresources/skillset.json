@@ -1,0 +1,83 @@
+{
+    "@odata.etag": "\"0x8DD4F598CA7B372\"",
+    "name": "vector-1739784348396-skillset",
+    "description": "Skillset to chunk documents and generate embeddings",
+    "skills": [
+        {
+            "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+            "name": "#1",
+            "description": "Split skill to chunk documents",
+            "context": "/document",
+            "defaultLanguageCode": "en",
+            "textSplitMode": "pages",
+            "maximumPageLength": 2000,
+            "pageOverlapLength": 500,
+            "maximumPagesToTake": 0,
+            "unit": "characters",
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/content",
+                    "inputs": []
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "textItems",
+                    "targetName": "pages"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+            "name": "#2",
+            "context": "/document/pages/*",
+            "resourceUri": "https://whk2scxvsxw5y.openai.azure.com",
+            "deploymentId": "embedding",
+            "dimensions": 1536,
+            "modelName": "text-embedding-ada-002",
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/pages/*",
+                    "inputs": []
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "embedding",
+                    "targetName": "text_vector"
+                }
+            ]
+        }
+    ],
+    "indexProjections": {
+        "selectors": [
+            {
+                "targetIndexName": "vector-1739784348396",
+                "parentKeyFieldName": "parent_id",
+                "sourceContext": "/document/pages/*",
+                "mappings": [
+                    {
+                        "name": "text_vector",
+                        "source": "/document/pages/*/text_vector",
+                        "inputs": []
+                    },
+                    {
+                        "name": "chunk",
+                        "source": "/document/pages/*",
+                        "inputs": []
+                    },
+                    {
+                        "name": "title",
+                        "source": "/document/title",
+                        "inputs": []
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "projectionMode": "skipIndexingParentDocuments"
+        }
+    }
+}

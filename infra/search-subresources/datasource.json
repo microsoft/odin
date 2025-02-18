@@ -1,0 +1,11 @@
+{
+    "name": "vector-1739784348396-datasource",
+    "description": "",
+    "type": "azureblob",
+    "credentials": {
+        "connectionString": "<replace me>"
+    },
+    "container": {
+        "name": "docs"
+    }
+}

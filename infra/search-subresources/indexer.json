@@ -1,0 +1,34 @@
+{
+    "@odata.context": "https://srch-whk2scxvsxw5y.search.windows.net/$metadata#indexers/$entity",
+    "@odata.etag": "\"0x8DD4F5A4BD2EB24\"",
+    "name": "vector-1739784348396-indexer",
+    "description": null,
+    "dataSourceName": "vector-1739784348396-datasource",
+    "skillsetName": "vector-1739784348396-skillset",
+    "targetIndexName": "vector-1739784348396",
+    "disabled": null,
+    "schedule": {
+        "interval": "P1D",
+        "startTime": "2025-02-17T09:29:24.137Z"
+    },
+    "parameters": {
+        "batchSize": null,
+        "maxFailedItems": null,
+        "maxFailedItemsPerBatch": null,
+        "base64EncodeKeys": null,
+        "configuration": {
+            "dataToExtract": "contentAndMetadata",
+            "parsingMode": "default"
+        }
+    },
+    "fieldMappings": [
+        {
+            "sourceFieldName": "metadata_storage_name",
+            "targetFieldName": "title",
+            "mappingFunction": null
+        }
+    ],
+    "outputFieldMappings": [],
+    "cache": null,
+    "encryptionKey": null
+}
