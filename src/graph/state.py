@@ -1,7 +1,5 @@
 from typing import List, TypedDict
-from typing import Any, Dict, List, Annotated
-from langchain_core.documents import Document
-import operator
+from typing import Any, Dict, List
 
 class GraphState(TypedDict):
     """

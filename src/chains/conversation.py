@@ -1,7 +1,6 @@
 from langchain import hub
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import MessagesPlaceholder
 from llms.llms import llm_4o
 
