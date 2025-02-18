@@ -83,35 +83,14 @@ def converse(claim_id: str, conversation_id: str):
     ):
         return json.dumps({"error": "Mismatched conversation ID or claim ID"}), 400
 
-    conversation_service.upsert_conversation(conversation)
+    conv_result = run_agent(conversation.messages[-1]["content"], claimnumber=claim_id, chat_history=conversation.messages)
 
     # faking chat for now
-    conversation.messages.append(
-        {
-            "content": "I'm just a magic string, how am I supposed to help?",
-            "role": "assistant",
-            "date": datetime.now().isoformat()
-        }
-    )
+    conversation.messages.append(conv_result)
 
     conversation_service.upsert_conversation(conversation)
 
     return jsonify(conversation.to_dict())
-
-    # chat_history = conversation.messages
-
-    # conv_result = run_agent(conversation.messages[-1]["content"], chat_history)
-
-    # if conversation does not exist, initialize one
-
-    # if one does exist, retrieve the history, append the message to it
-
-    # maybe need to change up the model a bit
-
-    # we probably only want to be passing the last message back and forth
-    # and just let fetching of full conversation history be the GET endpoints concern
-
-    # return jsonify(conv_result["generation"])
 
 
 @app.route("/claims/<claim_id>/conversations/<conversation_id>", methods=["DELETE"])
