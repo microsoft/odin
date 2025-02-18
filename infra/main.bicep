@@ -328,17 +328,7 @@ module databaseAccount 'br/public:avm/res/document-db/database-account:0.11.0' =
       ipRules: []
       networkAclBypass: 'AzureServices'
       publicNetworkAccess: 'Enabled'
-    }
-    sqlRoleAssignmentsPrincipalIds: [
-      principalId
-      site.outputs.?systemAssignedMIPrincipalId!
-    ]
-    sqlRoleDefinitions: [
-      {
-        name: '00000000-0000-0000-0000-000000000002'
-        roleType: 'BuiltInRole'
-      }
-    ]
+    }    
     locations: [
       {
         locationName: location
@@ -367,49 +357,16 @@ module databaseAccount 'br/public:avm/res/document-db/database-account:0.11.0' =
 
 /*
 TODO: possible bug in AVM Bicep module... should investigate
-
-Kept getting the following error when trying to use sqlRoleDefinitions in databaseAccountDeployment
-
-ERROR: deployment failed: error deploying infrastructure: deploying to subscription:
-
-Deployment Error Details:
-InvalidTemplate: Deployment template language expression evaluation failed: 'The provided arguments for template language function 'uniqueString' is not valid: all function arguments should be string literals. Please see https://aka.ms/arm-functions for usage details.'. Please see https://aka.ms/arm-functions for usage details.
 */
-// var sqlRoleDefinitions = [
-//   {
-//     name: '00000000-0000-0000-0000-000000000002'
-//     roleType: 'BuiltInRole'
-//   }
-// ]
 
-// var sqlRoleAssignmentsPrincipalIds = [
-//   principalId
-//   site.outputs.?systemAssignedMIPrincipalId!
-// ]
-
-// module databaseAccount_sqlRoleDefinitions './db-assignments.bicep' = [
-//   for sqlRoleDefinition in (sqlRoleDefinitions ?? []): {
-//     scope: resourceGroup(rg.name)
-//     name: '${uniqueString(deployment().name, location)}-sqlrd-${sqlRoleDefinition.name}'
-//     params: {
-//       name: sqlRoleDefinition.name
-//       databaseAccountName: databaseAccount.name
-//       // dataActions: sqlRoleDefinition.?dataActions
-//       // roleName: sqlRoleDefinition.?roleName
-//       // roleType: sqlRoleDefinition.?roleType
-//       principalIds: sqlRoleAssignmentsPrincipalIds
-//     }
-//   }
-// ]
-
-// module dbRoleAssignments './db-assignments.bicep' = {
-//   scope: resourceGroup(rg.name)
-//   name: 'sqlRoleAssignmentDeployment'
-//   params: {
-//     databaseAccountName: databaseAccount.outputs.name
-//     principalIds: [principalId]
-//   }
-// }
+module dbRoleAssignments './db-assignments.bicep' = {
+  scope: resourceGroup(rg.name)
+  name: 'sqlRoleAssignmentDeployment'
+  params: {
+    databaseAccountName: databaseAccount.outputs.name
+    principalIds: [principalId]
+  }
+}
 
 // app service plan: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/web/serverfarm
 module serverfarm 'br/public:avm/res/web/serverfarm:0.4.1' = {
