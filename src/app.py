@@ -4,7 +4,7 @@ from models.claim import Claim
 from models.conversation import Conversation
 from services.claims_service import claims_service
 from config import AppConfig
-from setup_logging import set_up_logging, set_up_metrics, set_up_tracing
+from dev_testing.setup_logging import set_up_logging, set_up_metrics, set_up_tracing
 
 config = AppConfig()
 
