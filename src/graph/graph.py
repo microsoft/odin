@@ -1,6 +1,6 @@
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from langgraph.graph import END, StateGraph
-from chains.router import question_router, RouteQuery
+#from chains.router import question_router, RouteQuery
 from nodes.generate import generate
 from nodes.retrieve import retrieve
 from nodes.route import route
@@ -42,4 +42,4 @@ workflow.add_edge(GENERATE, END)
 
 app = workflow.compile()
 
-app.get_graph().draw_mermaid_png(output_file_path="./docs/graph_image.png")
+app.get_graph().draw_mermaid_png(output_file_path="docs\\graph_image.png")
