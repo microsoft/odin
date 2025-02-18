@@ -9,3 +9,4 @@ python-dotenv
 azure-ai-inference[opentelemetry]
 azure-monitor-opentelemetry
 opentelemetry-exporter-otlp
+azure-storage-blob
