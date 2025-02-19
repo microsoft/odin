@@ -7,7 +7,7 @@ from config import config
 def azure_blob_for_chat_history(request_json, conversation_id, recall_history_only=False, conv_result=None):
 
     # Azure Storage Account details
-    AZURE_STORAGE_CONNECTION_STRING = config.azure_strg_conn_str
+    AZURE_STORAGE_CONNECTION_STRING = config.azure_storage_connection_string
     CONTAINER_NAME = "chat-histories"
     BLOB_NAME = f"{conversation_id}.pkl"
     # define client
