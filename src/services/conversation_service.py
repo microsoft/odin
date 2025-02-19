@@ -51,14 +51,14 @@ class CosmosConversationService:
         #     raise
         return container_client
 
-    def get_conversations(self, claim_id: str) -> list[Conversation]:
+    def get_conversations(self, user_id: str, claim_id: str) -> list[Conversation]:
         container = self.__try_and_get_container__()
 
         conversations_list = []
 
         for item in container.query_items(
             partition_key=claim_id,
-            query=f"SELECT * FROM c",
+            query=f"SELECT * FROM c WHERE c.user_id='{user_id}'",
         ):
             conversation = Conversation(
                 claim_id=item["claim_id"],
@@ -71,12 +71,14 @@ class CosmosConversationService:
 
         return conversations_list
 
-    def get_conversation(self, claim_id: str, conversation_id: int) -> Conversation:
+    def get_conversation(
+        self, user_id: str, claim_id: str, conversation_id: int
+    ) -> Conversation:
         container = self.__try_and_get_container__()
 
         for item in container.query_items(
             partition_key=claim_id,
-            query=f'SELECT * FROM c WHERE c.id="{conversation_id}"',
+            query=f'SELECT * FROM c WHERE c.id="{conversation_id}" and c.user_id="{user_id}"',
         ):
             return Conversation(
                 claim_id=item["claim_id"],
@@ -96,12 +98,12 @@ class CosmosConversationService:
 
         container.upsert_item(body=item)
 
-    def delete_conversation(self, claim_id, conversation_id):
+    def delete_conversation(self, user_id: str, claim_id, conversation_id):
         container = self.__try_and_get_container__()
 
         for item in container.query_items(
             partition_key=claim_id,
-            query=f'SELECT * FROM c WHERE c.id="{conversation_id}"',
+            query=f'SELECT * FROM c WHERE c.id="{conversation_id}" and c.user_id="{user_id}"',
         ):
             container.delete_item(item, partition_key=claim_id)
 
@@ -176,23 +178,33 @@ class PickleFileConversationService:
         with open(self.filename, "wb") as file:
             pickle.dump(data_list, file)
 
-    def get_conversations(self, claim_id: str) -> list[Conversation]:
+    def get_conversations(self, user_id: str, claim_id: str) -> list[Conversation]:
         conversations = self.__get_file_state__()
         return [
             conversation
             for conversation in conversations
-            if conversation.claim_id == claim_id
+            if conversation.claim_id == claim_id and conversation.user_id == user_id
         ]
 
-    def get_conversation(self, claim_id: str, conversation_id: int) -> Conversation:
+    def get_conversation(
+        self, user_id: str, claim_id: str, conversation_id: int
+    ) -> Conversation:
         conversations = self.__get_file_state__()
         for conversation in conversations:
-            if conversation.claim_id == claim_id and conversation.id == conversation_id:
+            if (
+                conversation.claim_id == claim_id
+                and conversation.id == conversation_id
+                and conversation.user_id == user_id
+            ):
                 return conversation
 
-    def upsert_conversation(self, conversation: Conversation) -> Conversation:
+    def upsert_conversation(
+        self, user_id: str, conversation: Conversation
+    ) -> Conversation:
         conversations = self.__get_file_state__()
-        for i, existing_conversation in enumerate(conversations):
+        for i, existing_conversation in (
+            enumerate(conversations) if existing_conversation.user_id == user_id else []
+        ):
             if (
                 existing_conversation.claim_id == conversation.claim_id
                 and existing_conversation.id == conversation.id
@@ -205,12 +217,14 @@ class PickleFileConversationService:
         self.__save_file_state__(conversations)
         return conversation
 
-    def delete_conversation(self, claim_id, conversation_id):
+    def delete_conversation(self, user_id: str, claim_id, conversation_id):
         conversations = self.__get_file_state__()
         conversations = [
             conversation
             for conversation in conversations
-            if conversation.claim_id != claim_id or conversation.id != conversation_id
+            if conversation.claim_id != claim_id
+            or conversation.id != conversation_id
+            and conversation.user_id != user_id
         ]
         self.__save_file_state__(conversations)
 
