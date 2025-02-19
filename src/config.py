@@ -32,7 +32,9 @@ class Config:
         self.cosmos_container_name = os.getenv("COSMOS_CONTAINER_NAME")
         self.cosmos_partition_key = os.getenv("COSMOS_PARTITION_KEY")
 
-        self.azure_strg_conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        self.azure_storage_connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        self.azure_storage_endpoint = os.getenv("AZURE_STORAGE_ENDPOINT")
+        self.azure_storage_key = os.getenv("AZURE_STORAGE_KEY")
 
 config = Config()
 
