@@ -11,7 +11,7 @@ from auth.utils import get_authenticated_user_details
 from cai_chat.cai_chat import run_agent
 from models.claim import Claim
 from models.conversation import Conversation
-from services.conversation_service import conversation_service
+#from services.conversation_service import conversation_service
 from services.claims_service import claims_service
 
 # you can create an auth service to to get this value

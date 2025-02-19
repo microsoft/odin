@@ -9,11 +9,13 @@ llm = llm_4o
 class RouteQuery(BaseModel):
     """Route a user query to the most relevant datasource."""
 
-    Thought: str = Field(desription="think about which action to take and why")
+    Thought: str = Field(
+                         json_schema_extra={'description':"think about which action to take and why"}
+                         )
     
     Action: str = Field(
-        description="The name of the action to take",
-    )
+                        json_schema_extra={'description':"The name of the action to take"}
+                         )
 
 structured_llm_router = llm.with_structured_output(RouteQuery)
 
