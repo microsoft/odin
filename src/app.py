@@ -23,8 +23,9 @@ def health():
 
 @app.route("/")
 def homepage():
+    user = get_authenticated_user_details(request.headers)
     # Replace this with actual data retrieval logic
-    claims = claims_service.get_all()
+    claims = claims_service.get_all(user["user_principal_id"])
     return render_template("homepage.html", claims=claims)
 
 
