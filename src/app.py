@@ -1,10 +1,8 @@
+from config import config
+
 from setup_logging import setup_azure_monitor
 
 setup_azure_monitor()
-
-from config import config
-from azure.monitor.opentelemetry import configure_azure_monitor
-configure_azure_monitor(connection_string=config.app_insights_connstr)
 
 from datetime import datetime
 import uuid
@@ -15,6 +13,7 @@ from models.claim import Claim
 from models.conversation import Conversation
 from services.conversation_service import conversation_service
 from services.claims_service import claims_service
+
 # you can create an auth service to to get this value
 # or retrieve from user claims on jwt
 # for now we are using a hardcoded value

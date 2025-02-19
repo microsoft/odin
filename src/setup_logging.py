@@ -94,10 +94,10 @@ def set_up_metrics():
 
 def setup_azure_monitor():
     set_up_logging()
-    tracer_provider = set_up_tracing()
+    set_up_tracing()
     set_up_metrics()
-    FlaskInstrumentor().instrument(tracer_provider=tracer_provider)
-    LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+    FlaskInstrumentor().instrument()
+    LangChainInstrumentor().instrument()
 
 
 __all__ = [setup_azure_monitor]
