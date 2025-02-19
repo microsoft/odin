@@ -38,15 +38,16 @@ class ClaimsService:
         return [claim for claim in self.claims if claim.user_id == user_id]
 
     def get_by_id(self, user_id: str, claim_id: str) -> Claim:
-        for claim in self.claims if claim.user_id == user_id else []:
-            if claim.claim_id == claim_id:
+        for claim in self.claims:
+            if claim.claim_id == claim_id and claim.user_id == user_id:
                 return claim
 
     def upsert(self, claim: Claim) -> None:
-        for i, existing_claim in (
-            enumerate(self.claims) if existing_claim.user_id == claim.user_id else []
-        ):
-            if existing_claim.claim_id == claim.claim_id:
+        for i, existing_claim in enumerate(self.claims):
+            if (
+                existing_claim.claim_id == claim.claim_id
+                and existing_claim.user_id == claim.user_id
+            ):
                 self.claims[i] = claim
                 return
         self.claims.append(claim)

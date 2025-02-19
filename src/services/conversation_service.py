@@ -2,7 +2,6 @@
 # and offering a basic persistence methoddology as a stand
 # in until we add support for
 # https://python.langchain.com/v0.2/api_reference/_modules/langchain_community/chat_message_histories/cosmos_db.html#CosmosDBChatMessageHistory
-import json
 import os
 import pickle
 import sys
@@ -72,7 +71,7 @@ class CosmosConversationService:
         return conversations_list
 
     def get_conversation(
-        self, user_id: str, claim_id: str, conversation_id: int
+        self, user_id: str, claim_id: str, conversation_id: str
     ) -> Conversation:
         container = self.__try_and_get_container__()
 
@@ -143,7 +142,7 @@ class PickleFileConversationService:
                 "conversation-store"
             )
             blob_client = container_client.get_blob_client("conversation-store.pkl")
-            if blob_client.exists():
+            if blob_client != None and blob_client.exists():
                 blob_data = blob_client.download_blob().readall()
                 data_list = pickle.loads(blob_data)
             else:
@@ -187,7 +186,7 @@ class PickleFileConversationService:
         ]
 
     def get_conversation(
-        self, user_id: str, claim_id: str, conversation_id: int
+        self, user_id: str, claim_id: str, conversation_id: str
     ) -> Conversation:
         conversations = self.__get_file_state__()
         for conversation in conversations:
@@ -198,22 +197,23 @@ class PickleFileConversationService:
             ):
                 return conversation
 
-    def upsert_conversation(
-        self, user_id: str, conversation: Conversation
-    ) -> Conversation:
+    def upsert_conversation(self, conversation: Conversation) -> Conversation:
         conversations = self.__get_file_state__()
-        for i, existing_conversation in (
-            enumerate(conversations) if existing_conversation.user_id == user_id else []
-        ):
+
+        updated = False
+
+        for i, existing_conversation in enumerate(conversations):
             if (
                 existing_conversation.claim_id == conversation.claim_id
+                and existing_conversation.user_id == conversation.user_id
                 and existing_conversation.id == conversation.id
             ):
                 conversations[i] = conversation
-            self.__save_file_state__(conversations)
-            return conversation
-
-        conversations.append(conversation)
+                updated = True
+            # self.__save_file_state__(conversations)
+            # return conversation
+        if not updated:
+            conversations.append(conversation)
         self.__save_file_state__(conversations)
         return conversation
 
@@ -224,7 +224,7 @@ class PickleFileConversationService:
             for conversation in conversations
             if conversation.claim_id != claim_id
             or conversation.id != conversation_id
-            and conversation.user_id != user_id
+            or conversation.user_id != user_id
         ]
         self.__save_file_state__(conversations)
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 from flask import Flask, json, make_response, render_template, request, jsonify
 from auth.utils import get_authenticated_user_details
 from cai_chat.cai_chat import run_agent
@@ -43,6 +44,7 @@ def get_claim(claim_id: str):
     claim = claims_service.get_by_id(user["user_principal_id"], claim_id)
     if not claim:
         return json.dumps({"error": "Claim not found"}), 404
+
     return json.dumps(claim.to_dict())
 
 
@@ -55,7 +57,9 @@ def upsert_claim():
         claim = Claim(**claim_data, user_id=user["user_principal_id"])
     except (TypeError, ValueError) as e:
         return json.dumps({"error": str(e)}), 400
+
     claims_service.upsert(claim)
+
     return make_response("Accepted", 202)
 
 
@@ -64,6 +68,7 @@ def delete_claim(claim_id: str):
     user = get_authenticated_user_details(request.headers)
 
     claims_service.delete(user["user_principal_id"], claim_id)
+
     return make_response("Accepted", 202)
 
 
@@ -71,7 +76,9 @@ def delete_claim(claim_id: str):
 def get_conversations(claim_id: str):
     user = get_authenticated_user_details(request.headers)
 
-    conversations = conversation_service.get_conversations(user["user_principal_id"], claim_id)
+    conversations = conversation_service.get_conversations(
+        user["user_principal_id"], claim_id
+    )
 
     return json.dumps([conversation.to_dict() for conversation in conversations])
 
@@ -80,9 +87,16 @@ def get_conversations(claim_id: str):
 def get_conversation(claim_id: str, conversation_id: str):
     user = get_authenticated_user_details(request.headers)
 
+    claim = claims_service.get_by_id(user["user_principal_id"], claim_id)
+    if not claim:
+        return json.dumps({"error": "Claim not found"}), 404
+
     conversation = conversation_service.get_conversation(
         user["user_principal_id"], claim_id, conversation_id
     )
+
+    if not conversation:
+        return json.dumps({"error": "Conversation not found"}), 404
 
     return json.dumps(conversation.to_dict())
 
@@ -96,7 +110,20 @@ def get_conversation(claim_id: str, conversation_id: str):
 def converse(claim_id: str, conversation_id: str):
     user = get_authenticated_user_details(request.headers)
 
+    claim = claims_service.get_by_id(user["user_principal_id"], claim_id)
+    if not claim:
+        return json.dumps({"error": "Claim not found"}), 404
+
     request_json = request.get_json()
+
+    if "id" not in request_json:
+        if conversation_id is not None and conversation_id != "":
+            request_json["id"] = conversation_id
+        else:
+            request_json["id"] = str(uuid.uuid4())
+    elif request_json["id"] != conversation_id:
+        return json.dumps({"error": "Mismatched conversation ID"}), 400
+
     conversation = Conversation(
         **request_json, user_id=user["user_principal_id"], user_group_id=user_group_id
     )
@@ -131,7 +158,13 @@ def converse(claim_id: str, conversation_id: str):
 def delete_conversation(claim_id: str, conversation_id: str):
     user = get_authenticated_user_details(request.headers)
 
-    conversation_service.delete_conversation(user["user_principal_id"], claim_id, conversation_id)
+    claim = claims_service.get_by_id(user["user_principal_id"], claim_id)
+    if not claim:
+        return json.dumps({"error": "Claim not found"}), 404
+
+    conversation_service.delete_conversation(
+        user["user_principal_id"], claim_id, conversation_id
+    )
 
     return make_response("Accepted", 202)
 
