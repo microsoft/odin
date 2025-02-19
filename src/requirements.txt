@@ -12,7 +12,6 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp 
 opentelemetry-instrumentation-flask 
 opentelemetry-api
-opentelemetry-exporter-applicationinsights
 opentelemetry-instrumentation-logging
 azure-ai-inference[opentelemetry]
 azure-storage-blob
