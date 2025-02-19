@@ -27,16 +27,18 @@ class EvalBool(BaseModel):
 structured_llm_evaluator = llm.with_structured_output(EvalBool)
 
 system = """
-You are an AI evaluator tasked with analyzing whether a provided answer properly addresses a given question.
+You are an AI evaluator tasked with analyzing whether a provided answer addresses a given question.
 Here are the inputs:
+- Context: {context}
 - Question: {question}
 - Answer: {answer}
 
 Please think through the context and details of the question and answer. In your response:
 1. Explain your reasoning in the "Thought" field.
 2. Set "Evaluation" to True if the answer is reasonable and relevant; otherwise, set it to False.
+3. Your job is not to evaluate the quality of the answer. You only need to evaluate if the answer reasonably addresses the question.
 
-Begin your analysis now!
+Begin!
 """
 
 route_prompt = ChatPromptTemplate.from_messages(
