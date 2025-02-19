@@ -72,7 +72,6 @@ module workspace 'br/public:avm/res/operational-insights/workspace:0.11.0' = {
     location: location
     dataRetention: 30
     features: {
-      disableLocalAuth: true // todo: remove before OSS
       immediatePurgeDataOn30Days: true
     }
     roleAssignments: [
