@@ -15,3 +15,4 @@ opentelemetry-api
 opentelemetry-instrumentation-logging
 azure-ai-inference[opentelemetry]
 azure-storage-blob
+azure-monitor-opentelemetry-exporter
