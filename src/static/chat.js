@@ -28,7 +28,7 @@ $(document).ready(function () {
 
         let conversationId = null;
         let claimId = $("#claimsDropdown option:selected").val();
-         let converseUrl = conversationId
+        let converseUrl = conversationId
             ? `/claims/${claimId}/conversations/${conversationId}`
             : `/claims/${claimId}/conversations`;
 
@@ -40,7 +40,7 @@ $(document).ready(function () {
             },
             dataType: "json",
             data: JSON.stringify({
-                conversation_id: conversationId,
+                id: conversationId,
                 claim_id: claimId,
                 messages: [
                     {
@@ -54,11 +54,12 @@ $(document).ready(function () {
             // removing thinking
             $("#fullSpinner").remove();
             // add response
-            var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="/static/robot-assistant.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time"></span></div></div>';
+            var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="/static/robot-assistant.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data.messages[data.messages.length - 1].content + '<span class="msg_time"></span></div></div>';
             $("#chatMessageForm").append($.parseHTML(botHtml));
             // scroll down
             jQuery(document).find("#chatMessageForm").scrollTop(function () { return this.scrollHeight });
         });
+        
         event.preventDefault();
     });
 });

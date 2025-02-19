@@ -1,7 +1,5 @@
-@claimId = 6e3d0ae1-44be-4d2d-aeb9-c15d2bd73953
-@conversationId = 311f0f6b-67a4-4212-9919-15a82f23083c
-@userId = 99a71918-60a3-4a52-9e1a-d089bda2fc38
-@userGroupId = cb31e5f1-e226-41eb-aadf-9c957ff85287
+@claimId = 33c1828d-a26a-4eea-8581-0088357b58b9
+@conversationId = af34dd63-f417-4957-acea-b5977a9b8f1e
 
 GET {{host}}/claims/{{claimId}}/conversations
 
@@ -13,13 +11,36 @@ POST {{host}}/claims/{{claimId}}/conversations
 Content-Type: application/json
 
 {
-    "id": "{{conversationId}}",
     "claim_id": "{{claimId}}",
-    "user_id": "{{userId}}",
-    "user_group_id": "{{userGroupId}}",
     "messages": [
         {
             "content": "Hello, please give me a summary of this claim",
+            "date": "{{$datetime iso8601}}",
+            "role": "user"
+        }
+    ]
+}
+
+###
+POST {{host}}/claims/{{claimId}}/conversations/{{conversationId}}
+Content-Type: application/json
+
+{
+    "id": "{{conversationId}}",
+    "claim_id": "{{claimId}}",
+    "messages": [
+        {
+            "content": "Hello, please give me a summary of this claim",
+            "date": "2025-02-19T14:10:40.811Z",
+            "role": "user"
+        },
+        {
+          "content": "Of course! Please provide me with the claim number or any specific details you'd like included in the summary, and I'll be happy to assist you.",
+          "date": "2025-02-19T09:10:42.735614",
+          "role": "assistant"
+        },
+        {
+            "content": "My claim number is {{claimId}}",
             "date": "{{$datetime iso8601}}",
             "role": "user"
         }

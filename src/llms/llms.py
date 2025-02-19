@@ -13,12 +13,14 @@ if config.azure_openai_api_key is None or config.azure_openai_api_key == "":
     )
 
     llm_4o = AzureChatOpenAI(
+        azure_endpoint=config.azure_openai_endpoint,
         azure_deployment=config.azure_openai_deployment,
         api_version=config.azure_openai_version,
         azure_ad_token_provider=token_provider,
     )
 else:
     llm_4o = AzureChatOpenAI(
+        azure_endpoint=config.azure_openai_endpoint,
         azure_deployment=config.azure_openai_deployment,
         openai_api_key=config.azure_openai_api_key,
         api_version=config.azure_openai_version,
