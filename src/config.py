@@ -11,8 +11,6 @@ class Config:
 
         self.tenant_id = os.getenv("TENANT_ID")
 
-        self.app_insights_connstr = os.getenv("APPINSIGHTS_CONNECTION_STRING")
-
         self.azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         self.azure_openai_api_key = os.getenv("AZURE_OPENAI_API_KEY")
         self.azure_openai_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
