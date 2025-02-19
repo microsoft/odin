@@ -9,6 +9,7 @@ langchain
 langchain-community
 langchain-openai
 langgraph
+openinference.instrumentation.langchain
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-instrumentation-flask

@@ -5,18 +5,20 @@ from azure.monitor.opentelemetry.exporter import (
     AzureMonitorMetricExporter,
     AzureMonitorTraceExporter,
 )
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry._logs import set_logger_provider
 from opentelemetry.metrics import set_meter_provider
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from opentelemetry.sdk.metrics.view import DropAggregation, View
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.semconv.resource import ResourceAttributes
 from opentelemetry.trace import set_tracer_provider
+from openinference.instrumentation.langchain import LangChainInstrumentor
+
 
 # Create a resource to represent the service/sample
 resource = Resource.create(
@@ -25,7 +27,10 @@ resource = Resource.create(
 
 
 def filter_out_azure_monitor(record: logging.LogRecord) -> bool:
-    return not (record.name.startswith("azure.monitor.") or record.name.startswith("azure.core.pipeline.policies.http_logging_policy"))
+    return not (
+        record.name.startswith("azure.monitor.")
+        or record.name.startswith("azure.core.pipeline.policies.http_logging_policy")
+    )
 
 
 def set_up_logging():
@@ -41,7 +46,7 @@ def set_up_logging():
 
     # Events from all child loggers will be processed by this handler.
     logger = logging.getLogger()
-    
+
     # Create a logging handler to write logging records, in OTLP format, to the exporter.
     handler = LoggingHandler()
     handler.addFilter(filter_out_azure_monitor)
@@ -53,6 +58,7 @@ def set_up_logging():
     logger.addHandler(stream_handler)
 
     logger.setLevel(logging.INFO)
+    return logger_provider
 
 
 def set_up_tracing():
@@ -67,6 +73,7 @@ def set_up_tracing():
 
     # Sets the global default tracer provider
     set_tracer_provider(tracer_provider)
+    return tracer_provider
 
 
 def set_up_metrics():
@@ -77,8 +84,20 @@ def set_up_metrics():
         metric_readers=[
             PeriodicExportingMetricReader(exporter, export_interval_millis=5000)
         ],
-        resource=resource
+        resource=resource,
     )
 
     # Sets the global default meter provider
     set_meter_provider(meter_provider)
+    return meter_provider
+
+
+def setup_azure_monitor():
+    set_up_logging()
+    tracer_provider = set_up_tracing()
+    set_up_metrics()
+    FlaskInstrumentor().instrument(tracer_provider=tracer_provider)
+    LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+__all__ = [setup_azure_monitor]
