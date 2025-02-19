@@ -31,7 +31,7 @@ class ClaimsService:
                 description="Claim to Iron Throne of Westeros",
                 amount=400.0,
                 status="Pending",
-            ),
+            )
         ]
 
     def get_all(self, user_id: str) -> list[Claim]:
