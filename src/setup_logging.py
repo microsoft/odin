@@ -19,7 +19,14 @@ from opentelemetry.semconv.resource import ResourceAttributes
 from opentelemetry.trace import set_tracer_provider
 
 # Create a resource to represent the service/sample
-resource = Resource.create({ResourceAttributes.SERVICE_NAME: "telemetry-application-insights-quickstart"})
+resource = Resource.create(
+    {ResourceAttributes.SERVICE_NAME: "telemetry-application-insights-quickstart"}
+)
+
+
+def filter_out_azure_monitor(record: logging.LogRecord) -> bool:
+    return not (record.name.startswith("azure.monitor.") or record.name.startswith("azure.core.pipeline.policies.http_logging_policy"))
+
 
 def set_up_logging():
     exporter = AzureMonitorLogExporter(connection_string=config.app_insights_connstr)
@@ -32,14 +39,19 @@ def set_up_logging():
     # Sets the global default logger provider
     set_logger_provider(logger_provider)
 
-    # Create a logging handler to write logging records, in OTLP format, to the exporter.
-    handler = LoggingHandler()
-    # Add filters to the handler to only process records from semantic_kernel.
-    # handler.addFilter(logging.Filter("semantic_kernel"))
-    # Attach the handler to the root logger. `getLogger()` with no arguments returns the root logger.
     # Events from all child loggers will be processed by this handler.
     logger = logging.getLogger()
+    
+    # Create a logging handler to write logging records, in OTLP format, to the exporter.
+    handler = LoggingHandler()
+    handler.addFilter(filter_out_azure_monitor)
     logger.addHandler(handler)
+
+    # Add a stream handler to the logger to print the logs to the console.
+    stream_handler = logging.StreamHandler()
+    stream_handler.addFilter(filter_out_azure_monitor)
+    logger.addHandler(stream_handler)
+
     logger.setLevel(logging.INFO)
 
 
@@ -48,9 +60,11 @@ def set_up_tracing():
 
     # Initialize a trace provider for the application. This is a factory for creating tracers.
     tracer_provider = TracerProvider(resource=resource)
+
     # Span processors are initialized with an exporter which is responsible
     # for sending the telemetry data to a particular backend.
     tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+
     # Sets the global default tracer provider
     set_tracer_provider(tracer_provider)
 
@@ -60,13 +74,11 @@ def set_up_metrics():
 
     # Initialize a metric provider for the application. This is a factory for creating meters.
     meter_provider = MeterProvider(
-        metric_readers=[PeriodicExportingMetricReader(exporter, export_interval_millis=5000)],
-        resource=resource,
-        views=[
-            # Dropping all instrument names except for those starting with "semantic_kernel"
-            #View(instrument_name="*", aggregation=DropAggregation()),
-            #View(instrument_name="semantic_kernel*"),
+        metric_readers=[
+            PeriodicExportingMetricReader(exporter, export_interval_millis=5000)
         ],
+        resource=resource
     )
+
     # Sets the global default meter provider
     set_meter_provider(meter_provider)
