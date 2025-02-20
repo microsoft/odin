@@ -31,6 +31,20 @@ class ClaimsService:
                 description="Claim to Iron Throne of Westeros",
                 amount=400.0,
                 status="Pending",
+            ),
+            Claim(
+                user_id="00000000-0000-0000-0000-000000000000",
+                claim_id="1234",
+                description="Claim 1234 ",
+                amount=400.0,
+                status="Pending",
+            ),
+            Claim(
+                user_id="00000000-0000-0000-0000-000000000000",
+                claim_id="4321",
+                description="Claim 4321",
+                amount=400.0,
+                status="Pending",
             )
         ]
 
