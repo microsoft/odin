@@ -14,6 +14,7 @@ param principalId string = ''
 
 param serviceName string = 'chat-app'
 
+param azureOpenAIApiVersion string = '2024-08-01-preview'
 param chatDeploymentName string = 'chat'
 param chatDeploymentVersion string = '2024-08-06'
 param embeddingDeploymentName string = 'embedding'
@@ -39,18 +40,6 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: tags
 }
 
-// user-assigned identity: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/managed-identity/user-assigned-identity
-// module userAssignedIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.4.0' = {
-//   scope: resourceGroup(rg.name)
-//   name: 'userAssignedIdentityDeployment'
-//   params: {
-//     // Required parameters
-//     name: '${abbrs.managedIdentityUserAssignedIdentities}${resourceToken}'
-//     // Non-required parameters
-//     location: location
-//   }
-// }
-
 // keyvault: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/key-vault/vault
 module vault 'br/public:avm/res/key-vault/vault:0.11.3' = {
   scope: resourceGroup(rg.name)
@@ -74,17 +63,6 @@ module workspace 'br/public:avm/res/operational-insights/workspace:0.11.0' = {
     features: {
       immediatePurgeDataOn30Days: true
     }
-    roleAssignments: [
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Log Analytics Contributor'
-      }
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Monitoring Contributor'
-      }
-    ]
-    //// Consider creating stored queries and linked storage accounts; maybe we just include them as separate files?
     // linkedStorageAccounts: [
     //   {
     //     name: 'savedsearches-link'
@@ -115,17 +93,6 @@ module component 'br/public:avm/res/insights/component:0.6.0' = {
     workspaceResourceId: workspace.outputs.resourceId
     retentionInDays: 30
     kind: 'web'
-    disableLocalAuth: true // todo: remove before OSS
-    roleAssignments: [
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Application Insights Component Contributor'
-      }
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Application Insights Snapshot Debugger'
-      }
-    ]
     tags: tags
   }
 }
@@ -153,25 +120,13 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.17.3' = {
         }
       ]
     }
-    roleAssignments: [
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Storage Blob Data Contributor'
-      }
-      {
-        principalId: searchService.outputs.?systemAssignedMIPrincipalId!
-        // principalId: userAssignedIdentity.outputs.principalId
-        roleDefinitionIdOrName: 'Storage Blob Data Contributor'
-      }
-
-      // todo: add search service role assignment
-      // todo: add app service role assignment (just in case they want to be able to display the full text)
-    ]
     tags: tags
   }
 }
 
-// ai hub: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/cognitive-services/account
+// Azure Open AI: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/cognitive-services/account
+// using this version of the resource vs AIServices allows AI Search index wizard to work
+// might consider adding an AI Services resource as well to enable use of other cognitive services e.g. document intelligence or vision
 module aiservices 'br/public:avm/res/cognitive-services/account:0.9.2' = {
   scope: resourceGroup(rg.name)
   name: 'aiHub'
@@ -210,80 +165,48 @@ module aiservices 'br/public:avm/res/cognitive-services/account:0.9.2' = {
         }
       }
     ]
-    roleAssignments: [
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: '64702f94-c441-49e6-a78b-ef80e0188fee' // Azure AI Developer
-      }
-      {
-        principalId: searchService.outputs.?systemAssignedMIPrincipalId!
-        // principalId: userAssignedIdentity.outputs.principalId
-        roleDefinitionIdOrName: '64702f94-c441-49e6-a78b-ef80e0188fee' // Azure AI Developer
-      }
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
-      }
-      {
-        principalId: searchService.outputs.?systemAssignedMIPrincipalId!
-        // principalId: userAssignedIdentity.outputs.principalId
-        roleDefinitionIdOrName: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
-      }
-    ]
     tags: tags
   }
 }
 
-// ai hub: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/machine-learning-services/workspace
-// module mlworkspace 'br/public:avm/res/machine-learning-services/workspace:0.10.0' = {
-//   scope: resourceGroup(rg.name)
-//   name: 'mlworkspace'
-//   params: {
-//     // Required parameters
-//     name: '${abbrs.machineLearningServicesWorkspaces}${resourceToken}'
-//     location: location
-//     kind: 'Hub'
-//     sku: 'Basic'
-//     // Non-required parameters
-//     associatedApplicationInsightsResourceId: component.outputs.resourceId
-//     associatedKeyVaultResourceId: vault.outputs.resourceId
-//     associatedStorageAccountResourceId: storageAccount.outputs.resourceId
-//     connections: [
-//       {
-//         category: 'AIServices'
-//         connectionProperties: {
-//           authType: 'AAD'
-//         }
-//         metadata: {
-//           ApiType: 'Azure'
-//           ApiVersion: '2023-07-01-preview'
-//           DeploymentApiVersion: '2023-10-01-preview'
-//           Location: location
-//           ResourceId: aiservices.outputs.resourceId
-//         }
-//         name: 'ai'
-//         target: 'AzureOpenAI'
-//       }
-//     ]
-//     managedIdentities: {
-//       systemAssigned: true
-//     }
-//     publicNetworkAccess: 'Enabled'
-//     // roleAssignments: [
-//     //   {
-//     //     principalId: principalId
-//     //     roleDefinitionIdOrName: 'Azure AI Developer'
-//     //   }
-//     //   {
-//     //     principalId: searchService.outputs.?systemAssignedMIPrincipalId!
-//     //     roleDefinitionIdOrName: 'Azure AI Developer'
-//     //   }
-//     // ]
-//     // workspaceHubConfig: {
-//     //   defaultWorkspaceResourceGroup: resourceGroup(rg.name).reasourceId
-//     // }
-//   }
-// }
+// Azure ML Workspace https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/machine-learning-services/workspace
+// this is required for preview tracing of langchain
+module mlworkspace 'br/public:avm/res/machine-learning-services/workspace:0.10.0' = {
+  scope: resourceGroup(rg.name)
+  name: 'mlworkspace'
+  params: {
+    // Required parameters
+    name: '${abbrs.machineLearningServicesWorkspaces}${resourceToken}'
+    location: location
+    kind: 'Hub'
+    sku: 'Basic'
+    // Non-required parameters
+    associatedApplicationInsightsResourceId: component.outputs.resourceId
+    associatedKeyVaultResourceId: vault.outputs.resourceId
+    associatedStorageAccountResourceId: storageAccount.outputs.resourceId
+    connections: [
+      {
+        category: 'AzureOpenAI'
+        connectionProperties: {
+          authType: 'AAD'
+        }
+        metadata: {
+          ApiType: 'Azure'
+          ApiVersion: '2023-07-01-preview'
+          DeploymentApiVersion: azureOpenAIApiVersion
+          Location: location
+          ResourceId: aiservices.outputs.resourceId
+        }
+        name: 'ai'
+        target: 'AzureOpenAI'
+      }
+    ]
+    managedIdentities: {
+      systemAssigned: true
+    }
+    publicNetworkAccess: 'Enabled'
+  }
+}
 
 // search: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/search/search-service
 module searchService 'br/public:avm/res/search/search-service:0.9.0' = {
@@ -294,24 +217,8 @@ module searchService 'br/public:avm/res/search/search-service:0.9.0' = {
     location: location
     disableLocalAuth: true // todo: remove before OSS
     managedIdentities: {
-      // userAssignedResourceIds: [userAssignedIdentity.outputs.resourceId]
       systemAssigned: true
     }
-    roleAssignments: [
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Search Service Contributor'
-      }
-      {
-        principalId: principalId
-        roleDefinitionIdOrName: 'Search Index Data Contributor'
-      }
-      {
-        // principalId: userAssignedIdentity.outputs.principalId
-        principalId: site.outputs.?systemAssignedMIPrincipalId!
-        roleDefinitionIdOrName: 'Search Index Data Contributor'
-      }
-    ]
     tags: tags
   }
 }
@@ -327,7 +234,7 @@ module databaseAccount 'br/public:avm/res/document-db/database-account:0.11.0' =
       ipRules: []
       networkAclBypass: 'AzureServices'
       publicNetworkAccess: 'Enabled'
-    }    
+    }
     locations: [
       {
         locationName: location
@@ -354,19 +261,6 @@ module databaseAccount 'br/public:avm/res/document-db/database-account:0.11.0' =
   }
 }
 
-/*
-TODO: possible bug in AVM Bicep module... should investigate
-*/
-
-module dbRoleAssignments './db-assignments.bicep' = {
-  scope: resourceGroup(rg.name)
-  name: 'sqlRoleAssignmentDeployment'
-  params: {
-    databaseAccountName: databaseAccount.outputs.name
-    principalIds: [principalId]
-  }
-}
-
 // app service plan: https://github.com/Azure/bicep-registry-modules/tree/main/avm/res/web/serverfarm
 module serverfarm 'br/public:avm/res/web/serverfarm:0.4.1' = {
   scope: resourceGroup(rg.name)
@@ -389,12 +283,28 @@ module site 'br/public:avm/res/web/site:0.13.3' = {
     location: location
     kind: 'app'
     managedIdentities: {
-      // userAssignedResourceIds: [userAssignedIdentity.outputs.resourceId]
       systemAssigned: true
     }
     appSettingsKeyValuePairs: {
       ENABLE_ORYX_BUILD: 'True'
       SCM_DO_BUILD_DURING_DEPLOYMENT: 'True'
+
+      AZURE_APP_INSIGHTS_CONN_STR: component.outputs.connectionString
+      AZURE_APP_INSIGHTS_INSTRUMENTATION_KEY: component.outputs.instrumentationKey
+
+      AZURE_OPENAI_ENDPOINT: aiservices.outputs.endpoint
+      AZURE_OPENAI_DEPLOYMENT: chatDeploymentName
+      AZURE_OPENAI_VERSION: azureOpenAIApiVersion
+
+      AZURE_AI_SEARCH_SERVICE_NAME: searchService.outputs.name
+      AZURE_AI_SEARCH_INDEX_NAME: indexName
+
+      COSMOS_ACCOUNT_URI: databaseAccount.outputs.endpoint
+      COSMOS_DB_NAME: cosmosDbName
+      COSMOS_CONTAINER_NAME: cosmosContainerName
+      COSMOS_PARTITION_KEY: cosmosPartitionKey
+
+      AZURE_STORAGE_ENDPOINT: storageAccount.outputs.primaryBlobEndpoint
     }
     serverFarmResourceId: serverfarm.outputs.resourceId
     siteConfig: {
@@ -427,9 +337,23 @@ module site 'br/public:avm/res/web/site:0.13.3' = {
   }
 }
 
+module permissions 'permissions.bicep' = {
+  scope: resourceGroup(rg.name)
+  name: 'permissionsDeployment'
+  params: {
+    userPrincipalId: principalId
+    apiPrincipalId: site.outputs.?systemAssignedMIPrincipalId!
+    searchPrincipalId: searchService.outputs.?systemAssignedMIPrincipalId!
+    databaseAccountName: databaseAccount.outputs.name
+  }
+}
+
+output AZURE_APP_INSIGHTS_CONN_STR string = component.outputs.connectionString
+output AZURE_APP_INSIGHTS_INSTRUMENTATION_KEY string = component.outputs.instrumentationKey
+
 output AZURE_OPENAI_ENDPOINT string = aiservices.outputs.endpoint
 output AZURE_OPENAI_DEPLOYMENT string = chatDeploymentName
-output AZURE_OPENAI_VERSION string = chatDeploymentVersion
+output AZURE_OPENAI_VERSION string = azureOpenAIApiVersion
 
 output AZURE_AI_SEARCH_SERVICE_NAME string = searchService.outputs.name
 output AZURE_AI_SEARCH_INDEX_NAME string = indexName
@@ -439,6 +363,7 @@ output COSMOS_DB_NAME string = cosmosDbName
 output COSMOS_CONTAINER_NAME string = cosmosContainerName
 output COSMOS_PARTITION_KEY string = cosmosPartitionKey
 
+output AZURE_STORAGE_ENDPOINT string = storageAccount.outputs.primaryBlobEndpoint
+
 output IS_DEPLOYED bool = false
 output LANGCHAIN_TRACING_V2 bool = false
-
