@@ -1,16 +1,17 @@
 # Project Title 
-Cai!
+Odin!
 
 # Description 
 This is a collaboration repo between AF Group + Microsoft for developing a POC claims assistant chatbot. 
 
 # Main Objectives
-1.	Web app + vector database + tracing
-2.	Ingestion pipeline
-3.	Azure functions as alternative host target
+1.	Azure OpenAI leveraged by LangGraph w/ RAG + Azure AI Search
+2.  Azure AI Foundry tracing
+3.  Chat persistence to CosmosDB
+4.  Flask chat UI
 
 # Current Agent Graph
-![Project Graph](src/graph_image.png)
+![Project Graph](docs/graph_image.png)
 
 ## Contributing
 
