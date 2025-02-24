@@ -16,6 +16,14 @@
                 {% endfor %}
             </select>
         </div>
+        <div class="form-group w-100 mb-3">
+            <label for="convoDropdown" class="form-label">Select Conversation:</label>
+            <select id="convoDropdown" class="form-control">
+                {% for convo in conversations %}
+                    <option value="{{ convo.id }}"> {{ convo.id }} </option>
+                {% endfor %}
+            </select>
+        </div>
         <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
         <div class="input-group-append">
             <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
