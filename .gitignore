@@ -1,5 +1,6 @@
 # Other
 *.pkl
+updated_sample_doc_text.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

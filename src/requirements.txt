@@ -4,6 +4,8 @@ azure-identity
 azure-monitor-opentelemetry
 azure-monitor-opentelemetry-exporter
 azure-storage-blob
+azure-search-documents
+azure-search
 Flask
 langchain
 langchain-community
