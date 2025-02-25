@@ -1,5 +1,6 @@
 Flask
 azure-ai-inference[opentelemetry]
+azure-ai-evaluation
 azure-identity
 azure-monitor-opentelemetry
 azure-monitor-opentelemetry-exporter
@@ -19,3 +20,4 @@ opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-logging
 opentelemetry-sdk
 python-dotenv
+scipy
