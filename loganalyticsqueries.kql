@@ -1,0 +1,11 @@
+// This query is analyzing the dependencies related to "AzureChatOpenAI" over the past 24 hours, focusing on the langgraph_node metadata. It calculates the average number of tokens used in prompts, completions, and total tokens for each langgraph_node, and orders the results by the average total tokens in descending order.
+
+dependencies
+| where target == "AzureChatOpenAI"
+| where timestamp between (ago(24h) .. now())
+| order by timestamp desc
+| extend metadata = parse_json(tostring(customDimensions["metadata"]))
+| where isnotempty(metadata["langgraph_node"])
+| project operation_Id, timestamp, langgraph_node = metadata["langgraph_node"], prompt_tokens = toint(customDimensions["llm.token_count.prompt"]), completion_tokens = toint(customDimensions["llm.token_count.completion"]), total_tokens = toint(customDimensions["llm.token_count.total"])
+| summarize avg_prompt_tokens = avg(prompt_tokens), avg_completion_tokens = avg(completion_tokens), avg_tokens = avg(total_tokens) by tostring(langgraph_node)
+| order by avg_tokens desc
