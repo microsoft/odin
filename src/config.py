@@ -22,7 +22,8 @@ class Config:
         self.azure_ai_search_service_name = os.getenv("AZURE_AI_SEARCH_SERVICE_NAME")
         self.azure_ai_search_index_name = os.getenv("AZURE_AI_SEARCH_INDEX_NAME")
         self.azure_ai_search_api_key = os.getenv("AZURE_AI_SEARCH_API_KEY")
-
+        self.azure_ai_search_url = os.getenv("AZURE_AI_SEARCH_URL")
+        
         self.langchain_tracing_v2 = os.getenv("LANGCHAIN_TRACING_V2")
         self.is_deployed = os.getenv("IS_DEPLOYED")
 
