@@ -5,6 +5,9 @@ azure-monitor-opentelemetry
 azure-monitor-opentelemetry-exporter
 azure-storage-blob
 azure.cosmos
+azure-search-documents
+azure-search
+Flask
 langchain
 langchain-community
 langchain-openai
