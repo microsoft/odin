@@ -1,13 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# test that we can 
-try:
-    print(os.environ['TEST_VAR'])
-except:
-    print("App is not seeing environment variables")
-    raise
-
 class Config:
     def __init__(self):
 

@@ -55,6 +55,7 @@ class CosmosConversationService:
 
         conversations_list = []
 
+        # get all conversations given a user ID and claim ID 
         for item in container.query_items(
             partition_key=claim_id,
             query=f"SELECT * FROM c WHERE c.user_id='{user_id}'",
