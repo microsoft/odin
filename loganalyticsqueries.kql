@@ -1,0 +1,54 @@
+// https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/
+
+// This query is analyzing the dependencies related to "AzureChatOpenAI" over the past 24 hours, focusing on the langgraph_node metadata. It calculates the average number of tokens used in prompts, completions, and total tokens for each langgraph_node, and orders the results by the average total tokens in descending order.
+dependencies
+| where target == "AzureChatOpenAI"
+| where timestamp between (ago(24h) .. now())
+| order by timestamp desc
+| extend metadata = parse_json(tostring(customDimensions["metadata"]))
+| where isnotempty(metadata["langgraph_node"])
+| project operation_Id, timestamp, langgraph_node = metadata["langgraph_node"], prompt_tokens = toint(customDimensions["llm.token_count.prompt"]), completion_tokens = toint(customDimensions["llm.token_count.completion"]), total_tokens = toint(customDimensions["llm.token_count.total"])
+| summarize avg_prompt_tokens = avg(prompt_tokens), avg_completion_tokens = avg(completion_tokens), avg_tokens = avg(total_tokens) by tostring(langgraph_node)
+| order by avg_tokens desc
+
+// find operation id by chat content within 30 min of a specific time
+let keywordOrPhrase = '';
+//let roughTimeFrame = now();
+let roughTimeFrame = todatetime("2025-02-24 10:00:00");
+let timespanInMin = 30;
+let timeframeStart = roughTimeFrame - ((timespanInMin / 2) * 1m);
+let timeframeEnd = roughTimeFrame + ((timespanInMin / 2) * 1m);
+dependencies
+| where timestamp between (timeframeStart .. timeframeEnd)
+| where target == 'AzureChatOpenAI'
+| where customDimensions contains keywordOrPhrase
+| order by timestamp desc
+| distinct operation_Id
+| project operation_Id
+
+// token use over time
+dependencies
+| where target == 'AzureChatOpenAI'
+| project timestamp, customDimensions['llm.token_count.total']
+
+// count of langgraph nodes invoked by node type
+dependencies
+| where target == 'AzureChatOpenAI'
+| extend metadataJson = parse_json(tostring(customDimensions['metadata']))
+| extend langgraph_node = tostring(metadataJson['langgraph_node'])
+| summarize count() by langgraph_node
+
+// average price of a node's invocation
+// prices reflect gpt-4o; it is priced per million tokens
+let inputPricePerToken = 2.5 / 1000000;
+let outputPricePerToken = 10 / 1000000;
+dependencies
+| where target == 'AzureChatOpenAI'
+| extend metadataJson = parse_json(tostring(customDimensions['metadata']))
+| extend langgraph_node = tostring(metadataJson['langgraph_node'])
+| extend promptTokens = toint(customDimensions['llm.token_count.prompt'])
+| extend completionTokens = toint(customDimensions['llm.token_count.completion'])
+| extend totalCost = (promptTokens * inputPricePerToken) + (completionTokens * outputPricePerToken)
+| summarize avgCost = avg(totalCost) by langgraph_node
+| project langgraph_node, avgCost
+
