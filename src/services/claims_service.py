@@ -45,6 +45,13 @@ class ClaimsService:
                 description="Claim 4321",
                 amount=400.0,
                 status="Pending",
+            ),
+            Claim(
+                user_id="00000000-0000-0000-0000-000000000000",
+                claim_id="289c8fa6-26e7-40ea-851c-cffe764f9fdd",
+                description="Mr John Doe with a history of hypertension, hyperlipidemia, and previous strokes.",
+                amount=400.0,
+                status="Pending",
             )
         ]
 
