@@ -30,11 +30,20 @@ def health():
 @app.route("/")
 def homepage():
     user = get_authenticated_user_details(request.headers)
+
+    connection_string = config.app_insights_connstr
     # Replace this with actual data retrieval logic
     claims = claims_service.get_all(user["user_principal_id"])
     # When we hit the homepage, the dropdown will auto select the first claim, so that's the claim we'll pass here
-    conversations = conversation_service.get_conversations(user["user_principal_id"], claims[0].claim_id)
-    return render_template("homepage.html", claims=claims, conversations=conversations)
+    conversations = conversation_service.get_conversations(
+        user["user_principal_id"], claims[0].claim_id
+    )
+    return render_template(
+        "homepage.html",
+        claims=claims,
+        conversations=conversations,
+        app_insights_connection_string=connection_string,
+    )
 
 
 @app.route("/claims", methods=["GET"])
