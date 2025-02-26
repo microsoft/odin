@@ -215,7 +215,7 @@ module searchService 'br/public:avm/res/search/search-service:0.9.0' = {
   params: {
     name: '${abbrs.searchSearchServices}${resourceToken}'
     location: location
-    disableLocalAuth: true // todo: remove before OSS
+    // consider turning of RBAC for search service since we can't use it with AzureAISearchRetriever (consider making a PR to that module to add managed identity support)
     managedIdentities: {
       systemAssigned: true
     }
@@ -298,6 +298,7 @@ module site 'br/public:avm/res/web/site:0.13.3' = {
 
       AZURE_AI_SEARCH_SERVICE_NAME: searchService.outputs.name
       AZURE_AI_SEARCH_INDEX_NAME: indexName
+      AZURE_AI_SEARCH_API_KEY: searchService.outputs.exportedSecrets.searchApiKey
 
       COSMOS_ACCOUNT_URI: databaseAccount.outputs.endpoint
       COSMOS_DB_NAME: cosmosDbName
@@ -348,6 +349,8 @@ module permissions 'permissions.bicep' = {
   }
 }
 
+// todo: output tenant id
+
 output AZURE_APP_INSIGHTS_CONN_STR string = component.outputs.connectionString
 output AZURE_APP_INSIGHTS_INSTRUMENTATION_KEY string = component.outputs.instrumentationKey
 
@@ -357,6 +360,7 @@ output AZURE_OPENAI_VERSION string = azureOpenAIApiVersion
 
 output AZURE_AI_SEARCH_SERVICE_NAME string = searchService.outputs.name
 output AZURE_AI_SEARCH_INDEX_NAME string = indexName
+output AZURE_AI_SEARCH_API_KEY string = '<find in the search service keys or keyvault>'
 
 output COSMOS_ACCOUNT_URI string = databaseAccount.outputs.endpoint
 output COSMOS_DB_NAME string = cosmosDbName
