@@ -19,6 +19,7 @@
         <div class="form-group w-100 mb-3">
             <label for="convoDropdown" class="form-label">Select Conversation:</label>
             <select id="convoDropdown" class="form-control">
+                <option value="">** new conversation **</option>
                 {% for convo in conversations %}
                     <option value="{{ convo.id }}"> {{ convo.id }} </option>
                 {% endfor %}
