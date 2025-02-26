@@ -42,7 +42,7 @@ class Config:
         config_vals = {
             "AZURE_APP_INSIGHTS_INSTRUMENTATION_KEY": self.app_insights_instrumentation_key,
             "AZURE_APP_INSIGHTS_CONN_STR": self.app_insights_connstr,
-            "TENANT_ID": self.tenant_id,
+            "AZURE_TENANT_ID": self.tenant_id,
             "AZURE_OPENAI_ENDPOINT": self.azure_openai_endpoint,
             "AZURE_OPENAI_API_KEY": self.azure_openai_api_key,
             "AZURE_OPENAI_DEPLOYMENT": self.azure_openai_deployment,

@@ -30,11 +30,20 @@ def health():
 @app.route("/")
 def homepage():
     user = get_authenticated_user_details(request.headers)
+
+    connection_string = config.app_insights_connstr
     # Replace this with actual data retrieval logic
     claims = claims_service.get_all(user["user_principal_id"])
     # When we hit the homepage, the dropdown will auto select the first claim, so that's the claim we'll pass here
-    conversations = conversation_service.get_conversations(user["user_principal_id"], claims[0].claim_id)
-    return render_template("homepage.html", claims=claims, conversations=conversations)
+    conversations = conversation_service.get_conversations(
+        user["user_principal_id"], claims[0].claim_id
+    )
+    return render_template(
+        "homepage.html",
+        claims=claims,
+        conversations=conversations,
+        app_insights_connection_string=connection_string,
+    )
 
 
 @app.route("/claims", methods=["GET"])
@@ -125,30 +134,39 @@ def converse(claim_id: str, conversation_id: str):
 
     request_json = request.get_json()
 
-    if "id" not in request_json:
-        if conversation_id is not None and conversation_id != "":
-            request_json["id"] = conversation_id
+    if "id" not in request_json:  # it's either a new conversation or a bad request
+        if (
+            conversation_id is not None and conversation_id != ""
+        ):  # it's an existing conversation but the id is missing
+            return json.dumps({"error": "Route and request body id mismatch."}), 400
         else:
             request_json["id"] = str(uuid.uuid4())
-    elif request_json["id"] != conversation_id:
-        return json.dumps({"error": "Mismatched conversation ID"}), 400
-    
-
-
-    if "id" not in request_json: # if it's a new convo, create Convo object
+            conversation = Conversation(
+                **request_json,
+                user_id=user["user_principal_id"],
+                user_group_id=user_group_id
+            )
+    elif request_json["id"] != conversation_id and (
+        conversation_id is not None and conversation_id != ""
+    ):  # it's an existing conversation but the id doesn't match
+        return json.dumps({"error": "Route and request body id mismatch."}), 400
+    else:  # it's an existing conversation
         conversation = Conversation(
-            **request_json, user_id=user["user_principal_id"], user_group_id=user_group_id
+            **request_json,
+            user_id=user["user_principal_id"],
+            user_group_id=user_group_id
         )
-    else: # if it's an existing convo, grab convo with all it's history
-        conversation = conversation_service.get_conversation(user["user_principal_id"], request_json["claim_id"], request_json["id"])
-        conversation.messages.append(request_json['messages'][0]) # append the new question to messages
-
-
-
-    if (
-        conversation.id != conversation_id and conversation_id is not None
-    ) or conversation.claim_id != claim_id:
-        return json.dumps({"error": "Mismatched conversation ID or claim ID"}), 400
+    ### since we landed on sending and receiving the full conversation, we can comment out the below code for now
+    ### in favor of the else above, you may consider using the below if you want to send and receive the
+    ### last message only which can improve latency by reducing payload size
+    # else:  # it's an existing conversation
+    #     # grab convo with all it's history
+    #     conversation = conversation_service.get_conversation(
+    #         user["user_principal_id"], request_json["claim_id"], request_json["id"]
+    #     )
+    #     conversation.messages.append(
+    #         request_json["messages"][0]
+    #     )  # append the new question to messages
 
     conversation_service.upsert_conversation(conversation)
 
