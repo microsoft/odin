@@ -23,6 +23,8 @@ var developerRoles = [
 var appRoles = [
   // Search Index Data Contributor
   '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+  // Key Vault Secrets User
+  '4633458b-17de-408a-b874-0445c86b69e6'
 ]
 
 // represents roles that are required for the user, api, and search service
@@ -100,7 +102,6 @@ resource searchMinimalRolesAssignment 'Microsoft.Authorization/roleAssignments@2
     }
   }
 ]
-
 
 // COSMOS DB ASSIGNMENTS
 resource databaseAccount 'Microsoft.DocumentDB/databaseAccounts@2024-12-01-preview' existing = {
