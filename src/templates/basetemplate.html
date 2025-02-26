@@ -33,28 +33,29 @@
 <!DOCTYPE html>
 <html class="chat_background">
 
-	<head>
-		<title>{% block title %}Chatbot{% endblock %}</title>
+<head>
+	<title>{% block title %}Chatbot{% endblock %}</title>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
 		integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}"/>
-        {% block head %}{% endblock %}
-	</head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}" />
+	<link rel="icon" href="{{ url_for('static', filename='favicon.ico')}}" type="image/x-icon">
+	{% block head %}{% endblock %}
+</head>
 
-	<body class="chat_background">
-		<div class="container-fluid h-100">
-			<!--justify-content-center is bootstrap flex shorthand for centering-->
-			<!--h-100 is bootstrap shorthand for height 100px-->
-			<div class="row justify-content-center h-100">
-				<div class="col-md-8 col-lg-8 chat_margin">
-					<div class="card">
-                        {% block content %}{% endblock %}
-					</div>
+<body class="chat_background">
+	<div class="container-fluid h-100">
+		<!--justify-content-center is bootstrap flex shorthand for centering-->
+		<!--h-100 is bootstrap shorthand for height 100px-->
+		<div class="row justify-content-center h-100">
+			<div class="col-md-8 col-lg-8 chat_margin">
+				<div class="card">
+					{% block content %}{% endblock %}
 				</div>
 			</div>
-        </div>
-		<div id="chat_ids" data-cids="{{ cs_ids_lst }}"></div>
-    </body>
+		</div>
+	</div>
+	<div id="chat_ids" data-cids="{{ cs_ids_lst }}"></div>
+</body>
 
 </html>
