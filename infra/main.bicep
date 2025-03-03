@@ -220,6 +220,10 @@ module searchService 'br/public:avm/res/search/search-service:0.9.0' = {
       systemAssigned: true
     }
     tags: tags
+    secretsExportConfiguration: {
+      keyVaultResourceId: vault.outputs.resourceId
+      primaryAdminKeyName: 'AZURE-AI-SEARCH-API-KEY'
+    }
   }
 }
 
@@ -298,7 +302,7 @@ module site 'br/public:avm/res/web/site:0.13.3' = {
 
       AZURE_AI_SEARCH_SERVICE_NAME: searchService.outputs.name
       AZURE_AI_SEARCH_INDEX_NAME: indexName
-      AZURE_AI_SEARCH_API_KEY: searchService.outputs.exportedSecrets.searchApiKey
+      AZURE_AI_SEARCH_API_KEY: searchService.outputs.exportedSecrets['AZURE-AI-SEARCH-API-KEY'].secretUri
 
       COSMOS_ACCOUNT_URI: databaseAccount.outputs.endpoint
       COSMOS_DB_NAME: cosmosDbName
